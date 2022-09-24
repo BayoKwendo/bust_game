@@ -716,21 +716,25 @@ exports.getGameHistory = function (callback) {
     query(sql, function (err, data) {
         if (err) throw err;
 
-        data.rows.forEach(function (row) {
-            // oldInfo is like: [{"username":"USER","bet":satoshis, ,..}, ..]
-            var oldInfo = row.player_info || [];
-            var newInfo = row.player_info = {};
+        if (data.rows.length > 0) {
+            data.rows.forEach(function (row) {
+                // oldInfo is like: [{"username":"USER","bet":satoshis, ,..}, ..]
+                var oldInfo = row.player_info || [];
+                var newInfo = row.player_info = {};
 
-            oldInfo.forEach(function (play) {
-                newInfo[play.username] = {
-                    bet: play.bet,
-                    stopped_at: play.stopped_at,
-                    bonus: play.bonus
-                };
+                oldInfo.forEach(function (play) {
+                    newInfo[play.username] = {
+                        bet: play.bet,
+                        stopped_at: play.stopped_at,
+                        bonus: play.bonus
+                    };
+                });
             });
-        });
+            callback(null, data.rows);
 
-        callback(null, data.rows);
+        }
+
+        callback(null)
     });
 };
 
