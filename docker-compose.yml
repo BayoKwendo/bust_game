@@ -1,13 +1,13 @@
-
+version: '3'
 
 services:
-  game_service:
+  game_serv_v2:
     restart: always
     network_mode: host
     build:
-      context: ./game_server
+      context: ./game_serv_v2
       dockerfile: Dockerfile
-    container_name: game_service
+    container_name: game_service_v2
      
   # web_service:
   #   restart: always
