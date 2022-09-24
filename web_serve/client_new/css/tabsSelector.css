@@ -1,0 +1,401 @@
+/* Container */
+
+@media handheld,
+only screen and (max-width: 767px) {
+  
+  #tabs-inner-container .tab-container ul {
+    color: #32526e;
+    font-size: 0.8rem;
+    /* left: 0; */
+    width: 100%;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    /* width: 1.5rem; */
+    overflow: hidden;
+    font-family: "Courier New";
+    height: 300px;
+    padding: 50px;
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    bottom: 0%;
+  }
+  
+  #tabs-inner-container .tab-container li.tab.col-2:first-child {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 30%;
+    text-align: center;  
+    bottom: 90%;
+  }
+  
+  #tabs-inner-container .tab-container li.tab.col-2:nth-child(1) a {
+    right: 0;
+    text-align: center;
+    width: 30%;
+    left: 0;
+    top: 90%;
+    margin: auto;
+    bottom: 90%;
+  }
+  
+}
+
+@media handheld,
+only screen and (min-width: 767px) {
+  
+  #tabs-inner-container .tab-container ul {
+    color: #32526e;
+    font-size: 0.8rem;
+    /* left: 0; */
+    width: 100%;
+    /* width: 1.5rem; */
+    overflow: hidden;
+    font-family: "Courier New";
+    height: auto;
+    padding: 50px;
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    bottom: 0%;
+  }
+  
+  
+}
+
+#tabs-inner-container .tab-container li.tab.col-2 {
+  display: inline-block;
+  /*height: 50%;*/
+  cursor: pointer;
+}
+
+#tabs-inner-container .tab-container li.tab.col-2:first-child {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 30%;
+  text-align: center;  
+  bottom: 90%;
+}
+
+#tabs-inner-container .tab-container li.tab.col-2:nth-child(1) a {
+  right: 0;
+  text-align: center;
+  width: 30%;
+  left: 0;
+  top: 90%;
+  margin: auto;
+  bottom: 80%;
+}
+
+
+
+#tabs-inner-container .tab-container li {
+  margin: 0;
+  padding: 0;
+}
+
+#tabs-inner-container .tab-container li.tab {
+  background: #ddd;
+}
+
+/** 2 columns **/
+
+
+#tabs-inner-container .tab-container li.tab.col-2:nth-child(2) {
+  position: absolute;
+  top: 0%;
+  right: 0;
+  width: 30%;
+  left: 30%;
+  bottom: 90%;
+}
+
+/** tab adjustments **/
+
+#tabs-inner-container .tab-container li.tab.col-2:nth-child(2) a {
+  top: 90%;
+  right: 0;
+  text-align: center;
+  margin: auto;
+  width: 30%;
+  left: 0;
+  bottom: 90%;
+}
+
+
+/** 3 columns **/
+#tabs-inner-container .tab-container li.tab.col-2:nth-child(3) {
+  position: absolute;
+  top: 0%;
+  right: 0;
+  width: 90%;
+  left: 60%;
+  bottom: 90%;
+}
+
+/** tab adjustments **/
+
+#tabs-inner-container .tab-container li.tab.col-2:nth-child(3) a {
+  top: 90%;
+  right: 0;
+  text-align: center;
+  margin: auto;
+  width: 90%;
+  left: 0;
+  bottom: 30%;
+}
+
+
+/* #tabs-inner-container .tab-container li.tab.col-3:nth-child(2) {
+  position: absolute;
+  top: 0%;
+  right: 0;
+  width: 30%;
+  left: 30%;
+  bottom: 90%;
+} */
+
+
+#tabs-inner-container .tab-container li.tab.col-3 {
+  position: absolute;
+  top: 0%;
+  right: 0;
+  width: 30%;
+  left: 0;
+  bottom: 90%;
+  cursor: pointer;
+}
+
+
+/* adjustment mobile */ 
+#tabs-inner-container .tab-container li.tab.col-3:first-child {
+  position: absolute;
+  top: 0%;
+  right: 0;
+  width: 33%;
+  left: 0;
+  bottom: 90%;
+}
+
+#tabs-inner-container .tab-container li.tab.col-3:nth-child(1) a {
+  top: 90%;
+  right: 0;
+  width: 33%;
+  left: 0;
+  margin: auto;
+  bottom: 90%;
+}
+
+
+#tabs-inner-container .tab-container li.tab.col-3:nth-child(2) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 33%;
+  left: 33%;
+  bottom: 90%;
+}
+#tabs-inner-container .tab-container li.tab.col-3:nth-child(2) a {
+  top: 0;
+  right: 0;
+  width: 33%;
+  left: 33%;
+  bottom: 90%;
+}
+
+
+
+
+#tabs-inner-container .tab-container li.tab.col-3:nth-child(3) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-align: center;
+  width: 34%;
+  right: 0; 
+  left: 66%;
+  bottom: 90%;}
+  
+  
+  #tabs-inner-container .tab-container li.tab.col-3:nth-child(3) a {
+    top: 0;
+    width: 34%;
+    left: 20%;
+    right: 0;
+    padding-right: 100px;
+    bottom: 90%;
+  }
+  
+  
+  /** tab adjustments **/
+  
+  #tabs-inner-container .tab-container li.tab.col-3:nth-child(2) a {
+    /* padding-left: 0.5rem; */
+  }
+  
+  /** 4 columns **/
+  
+  #tabs-inner-container .tab-container li.tab.col-4 {
+    display: table-row;
+    height: 33.33%;
+    width: 1.5rem;
+    cursor: pointer;
+    position: absolute;
+    font-family: "Courier New";
+    right: 0;
+    left: 0;
+  }
+  
+  
+  #tabs-inner-container .tab-container li.tab.col-4:first-child {
+    top: 0;
+    bottom: 90%;
+  }
+  
+  #tabs-inner-container .tab-container li.tab.col-4:nth-child(2) {
+    top: 0%;
+    right: 0;
+    width: 10%;
+    left: 10%;
+    bottom: 90%;
+  }
+  
+  #tabs-inner-container .tab-container li.tab.col-4:nth-child(3) {
+    top: 0%;
+    right: 0;
+    width: 10%;
+    left: 10%;
+    bottom: 90%;
+  }
+  
+  #tabs-inner-container .tab-container li.tab.col-4:nth-child(4) {
+    top: 0%;
+    right: 0;
+    width: 10%;
+    left: 10%;
+    bottom: 90%;
+  } */
+  
+  /** tab adjustments **/
+  
+  #tabs-inner-container .tab-container li.tab.col-4:nth-child(2) a {
+    padding-left: 0.5rem;
+    top: 0%;
+    right: 0;
+    width: 10%;
+    left: 10%;
+    bottom: 90%;
+  }
+  
+  #tabs-inner-container .tab-container li.tab.col-4:nth-child(4) a {
+    padding-left: 0.4rem;
+    top: 0%;
+    right: 0;
+    width: 10%;
+    left: 10%;
+    bottom: 90%;
+  }
+  
+  /** Tab content **/
+  
+  #tabs-inner-container .tab-container li.tab a {
+    vertical-align: middle;
+    line-height: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-family: "Courier New";
+    color: black;
+    display: block;
+    /* transform-origin: 50% 50%; */
+    position: absolute;
+    top: 50%;
+    font-weight: 800;
+  }
+  
+  #tabs-inner-container .tab-container li.tab.tab-active {
+    background-color: white;
+  }
+  
+  #tabs-inner-container .tab-container li.tab.tab-active a {
+    color: rgba(228, 121, 3, 1);
+    font-weight: 800;
+    top: 0%;
+    right: 0;
+    width: 100%;
+    left: 10%;
+    bottom: 90%;
+    
+    
+  }
+  
+  #tabs-inner-container .tab-container li.tab:hover a {
+    color: rgba(228, 121, 3, 1);
+  }
+  
+  /** Settings tab **/
+  
+  #tabs-inner-container .tab-container .tab-settings {
+    position: absolute;
+    height: 1.5rem;
+    top: calc(100% - 1.5rem);
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background: #ddd;
+  }
+  
+  #tabs-inner-container .tab-container .tab-settings.tab-active {
+    background: white;
+  }
+  
+  #tabs-inner-container .tab-container .tab-settings a {
+    vertical-align: initial;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 1rem;
+    display: block;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  #tabs-inner-container .tab-container .tab-settings i {
+    line-height: 1.5rem;
+    
+  }
+  
+  /* Widget */
+  
+  @media handheld,
+  only screen and (max-width: 767px) {
+    #tabs-inner-container .widget-container {
+      position: absolute;
+      right: 0;
+      top: 15%;
+      height: 97%;
+      left: 0;
+      bottom: 0;
+    }
+  }
+  
+  @media handheld,
+  only screen and (min-width: 767px) {
+    #tabs-inner-container .widget-container {
+      position: absolute;
+      top: 10%;
+      right: 0;
+      left: 0;    
+      bottom: 10%;
+      /* border-top-left-radius: 15px;
+      border-top-right-radius: 15px; */
+    }
+  }

@@ -1,0 +1,61 @@
+{{##def.page_title = 'Your account' #}}
+{{##def.content:
+<script type="text/javascript">
+    function logout() {
+        if (document.getElementById('logout')) {
+            if (confirm("Are you sure you want to log out?")) {
+                document.getElementById("logout").submit();
+            }
+        }
+    }
+</script>
+<form action="/logout" method="post" id='logout'></form>
+<div class="content row panel radius" style="overflow-y: auto; height: 600px">
+
+    <div class="account">
+        <div class="small-12 columns sets-content">
+            <h5 style="color: white;">Account</h5>
+            <hr>
+            <ul class="menu">
+                <li>
+                    <a href="/referral" class="button_menu">Affiliate Program</a>
+                </li>
+                <br />
+
+
+                <li>
+                    <a href="/security" class="button_menu">Security</a>
+                </li>
+                <br />
+
+                <li>
+                    <a href="/deposits" class="button_menu">Deposit</a>
+                </li>
+                <br />
+
+                <li>
+                    <a href="/withdraw" class="button_menu">Withdraw</a>
+                </li>
+                <br />
+
+                <li>
+                    <a href="/how_to_play" class="button_menu">FAQ</a>
+                </li>
+                <br />
+
+
+                <li class="button_menu" onclick="logout();">
+                    <a onclick="logout();">
+                        Logout
+                    </a>
+                </li>
+            </ul>
+            <br>
+
+            <br>
+
+        </div>
+    </div>
+</div>
+#}}
+{{#def.include('./template/main_new')}}

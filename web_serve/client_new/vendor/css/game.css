@@ -1,0 +1,397 @@
+@import url("reset.css");
+@import url("general.css");
+@import url("topBar.css");
+@import url("chat.css");
+@import url("tabsSelector.css");
+@import url("gamesLog.css");
+@import url("controlsSelector.css");
+@import url("controls.css");
+@import url("strategy.css");
+@import url("betBar.css");
+@import url("chart.css");
+@import url("chartControls.css");
+@import url("players.css");
+@import url("settingsSelector.css");
+@import url("textDisplay.css");
+@import url("displaySettings.css");
+@import url("hotkeysSettings.css");
+@import url("chatSettings.css");
+@import url("loading.css");
+
+/**
+ * Header Background/ Widget Border Color: #292d35
+ * Widget Background Color: #181a1e
+ */
+
+html,
+body {
+    overflow: hidden;
+}
+
+
+/* ==========================================================================
+   Game container
+   ========================================================================== */
+
+#game-wrapper {
+    width: 100%;
+    height: 100%;
+}
+
+#game-content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+#game-container {
+    width: 100%;
+    height: 100%;
+}
+
+div.callout {
+    height: 20px;
+    width: 130px;
+    /*float: left;*/
+    z-index: 1;
+}
+
+div.callout {
+    background-color: #444;
+    background-image: -moz-linear-gradient(top, #444, #444);
+    position: relative;
+    color: #ccc;
+    padding: 20px;
+    border-radius: 3px;
+    box-shadow: 0px 0px 20px #999;
+    margin: 25px;
+    min-height: 20px;
+    border: 1px solid #333;
+    text-shadow: 0 0 1px #000;
+    /*box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;*/
+}
+
+.callout::before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    border: 0.8em solid transparent;
+    position: absolute;
+}
+
+.callout.left::before {
+    left: 0%;
+    right: -20px;
+    top: 40%;
+    border-left: 10px solid #444;
+}
+
+.callout.top::before {
+    border-right: 11px solid #444;
+    bottom: 10px;
+    left: -20px;
+}
+
+.callout.bottom::before {
+    left: 45%;
+    top: -20px;
+    border-bottom: 10px solid #444;
+}
+
+.callout.right::before {
+    top: 40%;
+    border-right: 10px solid #444;
+}
+
+.callout.top-left::before {
+    /*left: 7px;*/
+    bottom: -20px;
+    border-top: 10px solid #444;
+}
+
+.callout.top-right::before {
+    /*right: 7px;*/
+    bottom: -20px;
+    border-top: 10px solid #444;
+}
+
+
+#game-message-container.hide {
+    display: none;
+}
+
+#game-message-container>span {
+    overflow-y: hidden;
+    padding-right: 20px;
+    display: block;
+}
+
+#game-message-container span>span,
+#game-message-container span>p {
+    color: #020503;
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    /* text-decoration: underline; */
+    font-weight: 800;
+}
+
+#game-message-container div {}
+
+/* Playable container (The game) */
+#game-playable-container {
+    position: absolute;
+    top: 2rem;
+    right: 0;
+    left: 0;
+    bottom: 0;
+}
+
+#game-playable-container.show-message {
+    /* top: 1.2rem; */
+    top: 2rem;
+}
+
+#game-message-container .close-message {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+}
+
+#game-message-container .close-message i {
+    color: rgb(19, 6, 6);
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    padding-right: 0.2rem;
+}
+
+@media handheld,
+only screen and (max-width: 767px) {
+    #game-message-container .close-message i {
+        font-size: 1rem;
+
+    }
+
+
+    #game-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    #game-scroll {
+        position: absolute;
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        overflow-y: auto;
+        scrollbar-width: none;
+        height: 80%;
+        padding: 10px;
+        border-radius: 25px;
+        right: 0;
+        left: 0;
+
+    }
+
+
+    /* Message bar */
+    #game-message-container {
+        position: absolute;
+        top: 18rem;
+        /* Firefox */
+        width: 80%;
+        height: 30%;
+        padding: 10px;
+        text-align: left;
+        margin-left: 10%;
+        /* position: fixed; */
+        border-radius: 10px;
+
+        right: 0;
+        left: 0;
+        color: #2ecc71;
+        /* line-height: 1.2rem; */
+        /* bottom: calc(100% - 1.2rem); */
+        background-color: rgb(207, 214, 207);
+    }
+
+}
+
+#game-message-container {
+    /* text-align: center; */
+    z-index: 999;
+}
+
+#game-inner-container {
+    font-family: cursive, sans-serif;
+    background-color: #2ecc71;
+    color: white;
+    border-radius: 4px;
+    box-shadow: 2px 2px 20px 23px #7fecad;
+    /* width: 100%; */
+    height: 90%;
+    position: relative;
+}
+
+#game-left-container {
+    display: table;
+    height: 100%;
+    width: 65%;
+    position: relative;
+}
+
+#game-left-container.small-window {
+    width: 100%;
+}
+
+#game-right-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 65%;
+    right: 0;
+    border: 1px solid #ddd;
+    margin: 5px;
+}
+
+
+/* ==========================================================================
+   Tabs container
+   ========================================================================== */
+
+#tabs-container {
+    border-left: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    display: table-row;
+}
+
+
+/* ==========================================================================
+   Chart-Controls container
+   ========================================================================== */
+
+#chart-controls-container {
+    border-left: 1px solid #ddd;
+    min-height: 400px;
+    display: table-row;
+    height: 50%;
+}
+
+#chart-controls-row,
+#tabs-controls-row {
+    display: table-row;
+
+}
+
+#chart-controls-col,
+#tabs-controls-col {
+    display: table-cell;
+}
+
+#tabs-controls-col .cell-wrapper,
+#chart-controls-col .cell-wrapper {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+
+@media handheld,
+only screen and (max-width: 767px) {
+    #chart-controls-col {
+        height: 68%;
+    }
+
+    #tabs-controls-col {
+        height: 32%;
+    }
+
+}
+
+@media handheld,
+only screen and (min-width: 767px) {
+
+
+    #game-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+
+    .cash_message {
+        font-family: 'Courier New', Courier, monospace;
+        padding-top: 10px;
+        padding-left: 5px;
+        /* font-style: bold; */
+    }
+
+
+    /* .cash_message::-webkit-scrollbar {
+        display: none;
+    }
+ */
+
+  
+    #game-scroll {
+        position: absolute;
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        overflow-y: auto;
+ 
+        overflow-y: auto;
+        height: 90%;
+        padding: 10px;
+        border-radius: 25px;
+        right: 0;
+        left: 0;
+
+    }
+
+    /* Message bar */
+    #game-message-container {
+        position: absolute;
+        width: 20%;
+        height: 30%;
+        top: 15rem;
+        width: 40%;
+        margin-left: 30%;
+        position: fixed;
+        border-radius: 10px;
+        right: 0;
+        left: 0;
+        color: #2ecc71;
+        /* line-height: 1.2rem; */
+        /* bottom: calc(100% - 1.2rem); */
+        background-color: rgb(207, 214, 207);
+    }
+
+    #chart-controls-col {
+        height: 55%;
+    }
+
+    #tabs-controls-col {
+        height: 45%;
+    }
+
+
+}
+
+
+
+/* Big Screens with small controls */
+@media handheld,
+only screen and (min-width: 767px) {
+    #chart-controls-col.small {
+        height: 10%;
+
+    }
+}
+
+/* Small Screens with small controls */
+@media handheld,
+only screen and (max-width: 767px) {
+    #chart-controls-col.small {
+        height: 20%;
+    }
+}

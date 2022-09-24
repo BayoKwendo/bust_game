@@ -1,0 +1,74 @@
+{{##def.page_title = 'Withdraw Request' #}}
+
+{{##def.content:
+<script type="text/javascript">
+
+    function myFunction() {
+        var x = document.getElementById("amount");
+        document.getElementById('total').innerHTML = "Withholding Tax: " + parseFloat(x.value * (0.2)).toFixed(2) + " /=";
+
+        document.getElementById('charge').innerHTML = "Withdrawal charges: " + parseFloat((x.value - (x.value * (0.2))) <= 1000 ? 16 : 24).toFixed(2) + " /=";
+
+        document.getElementById('net').innerHTML = "Money to your mpesa: " + parseFloat(x.value - (x.value * (0.2))).toFixed(2) + " /=";
+
+
+    }
+    function logout() {
+        if (document.getElementById('logout')) {
+            if (confirm("Are you sure you want to log out?")) {
+                document.getElementById("logout").submit();
+            }
+        }
+    }
+</script>
+<style>
+    label {
+        color: black;
+    }
+</style>
+
+<form action="/logout" method="post" id='logout'></form>
+<div class="content row panel radius">
+    <div class="large-8  large-offset-2 columns sets-content" style="overflow-y: auto; height: 500px">
+        <h5><b>Request A Withdrawal(Agency)</b></h5>
+
+        <form action="/withdraw-request_agency" method="post" style="">
+            <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+            <input style="display:none" type="text" name="fakeusernameremembered" />
+            <input style="display:none" type="password" name="fakepasswordremembered" />
+            <br />
+
+            <label for="account_no">Agent Account Code</label>
+            <input type="text" id="account_no" name="account_no" onkeyup="myFunction()" placeholder="Agent Code Number"
+                required />
+
+            <label for="amount">Amount</label>
+            <input type="number" id="amount" name="amount" onkeyup="myFunction()" placeholder="{{= it.miningFeeBits}}"
+                min="{{= it.miningFeeBits}}" step=".01" required />
+
+            <label for="password">Your password</label>
+
+            <input type="password" id="password" name="password" autocomplete="off" />
+            {{?it.user.mfa_secret}}
+            <label for="otp">2FA Code</label>
+            <input type="text" id="otp" name="otp" autocomplete="off" pattern="[0-9]{6}" required />
+            {{?}}
+            <p class="small">
+                <!-- <strong>N 12 is service charge charged on all withdrawals</strong>. -->
+            </p>
+
+
+            <a href="/" class="border-button ">Cancel</a>
+            <input class="button right blue" type="submit" />
+            <input type="hidden" name="withdrawal_id" value="{{= it.id}}" />
+        </form>
+
+        <p>
+        </p>
+
+    </div>
+</div>
+</div>
+#}}
+
+{{#def.include('./template/main_new')}}

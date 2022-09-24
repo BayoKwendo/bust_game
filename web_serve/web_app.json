@@ -1,0 +1,9 @@
+{
+    "apps": [
+        {
+            "name": "web_server_ng",
+            "script": "npm",
+            "args" : "start"
+        }
+    ]
+}

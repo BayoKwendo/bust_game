@@ -1,0 +1,184 @@
+{{##def.page_title = 'Register' #}}
+
+{{##def.content:
+<script src='https://www.recaptcha.net/recaptcha/api.js'>
+    window.onload = function () {
+    };
+
+
+</script>
+<script type="text/javascript">
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var x = document.getElementById("promo_code");
+
+        var y = document.getElementById("advert_add");
+
+
+        var query = new URLSearchParams(window.location.search);
+        if (query.get('token')) {
+            document.getElementById("promo_code").readOnly = true;
+            x.value = query.get('token')
+        }
+        else if (query.get('ref')) {
+            document.getElementById("advert_add").readOnly = true;
+            y.value = query.get('ref')
+
+        }
+    });
+
+
+    var submitEnabled = true;
+    function enableSubmit() {
+        submitEnabled = true;
+        var s = document.getElementById('registerSubmit');
+        s.style.display = 'block';
+    }
+
+
+    function myFunction() {
+        var x = document.getElementById("promo_code");
+
+        var query = new URLSearchParams(window.location.search);
+        if (query.get('token')) {
+            document.getElementById("promo_code").readOnly = true;
+            x.value = query.get('token')
+
+        }
+
+    }
+
+
+    window.onload = function () {
+        if (document.getElementById('confirmation') !== null) {
+            document.getElementById('confirmation').onchange = validatePassword;
+            document.getElementById('password').onchange = validatePassword;
+        }
+    };
+    function validatePassword() {
+        var password = document.getElementById('password').value;
+        var confirm = document.getElementById('confirmation').value;
+        if (password != confirm) {
+            document.getElementById('confirmation').setCustomValidity("Confirmation and password should be the same");
+        } else document.getElementById("confirmation").setCustomValidity('');
+    }
+
+
+</script>
+
+<div class="register large-6 large-offset-3">
+    <h6 id="total" style="color: white"></h6>
+    <form action="/register" method="post" onsubmit="return submitEnabled;">
+        <div class="row">
+            <div class=" columns input">
+
+                <h5 style="color: white;">Create a new account <small><a href="login">already have one?</a></small></h5>
+                <hr>
+                <br />
+                <br />
+            </div>
+
+
+
+            <div class="columns input">
+                <div class="row">
+                    <div class="large-3 columns">
+                        <label for="username">Username</label>
+                    </div>
+                    <div class="large-9 columns">
+
+                        <input id="username" type="text" name="user[name]" onkeyup="myFunction()"
+                            value="{{?it.values}}{{!it.values.name}}{{?}}" autocomplete="off"
+                            pattern="[A-Za-z0-9_\-]{3,16}"
+                            title="Username only allowed alphanumeric, hyphen and underscore" required />
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="columns input">
+                <div class="row">
+                    <div class="large-3 columns">
+                        <label for="phone">*Phone number (073XXXXX)</label>
+                    </div>
+                    <div class="large-9 columns">
+                        <input type="number" id="phone" onkeyup="myFunction()"
+                            value="{{?it.values}}{{!it.values.msisdn}}{{?}}" name="user[msisdn]" required />
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+
+            <div class="columns input">
+                <div class="row">
+                    <div class="large-3 columns">
+                        <label>Password</label>
+                    </div>
+                    <div class="large-9 columns">
+                        <input id="password" type="password" onkeyup="myFunction()"
+                            value="{{?it.values}}{{!it.values.password}}{{?}}" name="user[password]" autocomplete="off"
+                            pattern=".{7,200}" title="Password should be at least 7 characters" required />
+                        <small>Pick something secure, at least 7 characters</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="columns input">
+                <div class="row">
+                    <div class="large-3 columns">
+                        <label>Confirm Password</label>
+                    </div>
+                    <div class="large-9 columns">
+                        <input id="confirmation" type="password" onkeyup="myFunction()"
+                            value="{{?it.values}}{{!it.values.confirm}}{{?}}" name="user[confirm]" autocomplete="off"
+                            pattern=".{7,200}" data-equal-id="password" required />
+                    </div>
+                </div>
+            </div>
+            <div class="columns input">
+                <div class="row">
+                    <div class="large-3 columns">
+                        <label for="promo_code">Promocode (Optional)</label>
+                    </div>
+                    <div class="large-9 columns">
+                        <input id="promo_code" type="text" name="promo_code" />
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="columns input" hidden>
+                <div class="row">
+                    <div class="large-3 columns">
+                        <label for="advert_add">Advert Ads</label>
+                    </div>
+                    <div class="large-9 columns">
+                        <input id="advert_add" type="text" name="advert_add" />
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="columns">
+                <input id="registerSubmit" class="button right" data-callback="enableSubmit" type="submit"
+                    value="Register" />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+
+            </div>
+
+        </div>
+    </form>
+
+</div>
+
+#}}
+{{#def.include('./template/main_new')}}

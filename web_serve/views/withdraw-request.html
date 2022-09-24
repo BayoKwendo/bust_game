@@ -1,0 +1,78 @@
+{{##def.page_title = 'Withdraw Request' #}}
+
+{{##def.content:
+<script type="text/javascript">
+
+    function myFunction() {
+        var x = document.getElementById("amount");
+        document.getElementById('total').innerHTML = "Withholding Tax: " + parseFloat(x.value * (0.2)).toFixed(2) + " /=";
+
+        document.getElementById('charge').innerHTML ="Withdrawal charges: "+parseFloat((x.value - (x.value * (0.2))) <= 1000? 16: 24).toFixed(2) + " /="; 
+
+        document.getElementById('net').innerHTML = "Money to your mpesa: " + parseFloat(x.value - (x.value * (0.2))).toFixed(2) + " /=";
+
+
+
+    }
+    function logout() {
+        if (document.getElementById('logout')) {
+            if (confirm("Are you sure you want to log out?")) {
+                document.getElementById("logout").submit();
+            }
+        }
+    }
+</script>
+<style>
+    label {
+        color: black;
+    }
+</style>
+
+<form action="/logout" method="post" id='logout'></form>
+<div class="content row panel radius">
+    <div class="large-8  large-offset-2 columns sets-content" style="overflow-y: auto; height: 500px">
+        <h5 style="color:white"><b>Request A Withdrawal</b></h5>
+        <h6 style="color:white" id="total"></h6>
+
+        <h6 style="color:white" id="net"></h6>
+
+        <h6 style="color:white" id="charge"></h6>
+
+        <form action="/withdraw-request" method="post" style="">
+            <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+            <input style="display:none" type="text" name="fakeusernameremembered" />
+            <input style="display:none" type="password" name="fakepasswordremembered" />
+
+            <label for="amount">Amount</label>
+            <input type="number" id="amount" name="amount" onkeyup="myFunction()" placeholder="{{= it.miningFeeBits}}"
+                min="{{= it.miningFeeBits}}" step=".01" required />
+
+            <label for="password">Your password</label>
+
+            <input type="password" id="password" name="password" autocomplete="off" />
+            {{?it.user.mfa_secret}}
+            <label for="otp">2FA Code</label>
+            <input type="text" id="otp" name="otp" autocomplete="off" pattern="[0-9]{6}" required />
+            {{?}}
+            <p style="color:white" class="small">
+                **The minimum amount for a withdrawal is 100 ksh. You will receive 20 percent less than what you
+                withdraw,
+                as we use that as <b>Withholding Tax</b>.
+            </p>
+
+
+            <a href="/" class="border-button ">Back</a>
+            <input class="button right blue" type="submit" />
+            <input type="hidden" name="withdrawal_id" value="{{= it.id}}" />
+        </form>
+
+        <p style="color:white">
+            <strong style="color:white" >Note:</strong> Your withdrawal will be sent to your m-pesa account.
+        </p>
+
+    </div>
+</div>
+</div>
+#}}
+
+{{#def.include('./template/main_new')}}

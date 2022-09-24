@@ -1,0 +1,9 @@
+{
+    "apps": [
+        {
+            "name": "game_server_ng",
+            "script": "npm",
+            "args" : "start"
+        }
+    ]
+}

@@ -1,0 +1,273 @@
+#top-bar .user-login {
+  float: right;
+  line-height: 40px;
+  text-decoration: underline;
+
+}
+
+/** Toggle design **/
+
+#top-bar .toggle-view {
+  line-height: 2rem;
+  float: right;
+  margin-right: 2rem;
+  cursor: pointer;
+}
+
+
+
+@media handheld,
+only screen and (max-width: 767px) {
+  #top-bar .toggle-view {
+    margin-right: 0.5rem;
+  }
+}
+
+#top-bar .toggle-view a {
+  border: 2px solid grey;
+  padding: 2px;
+}
+
+#top-bar .title_header {
+  float: left;
+  text-decoration: underline;
+
+  /* width: 80px;
+  margin-top: -10px;
+  height: 80px; */
+}
+
+@media handheld,
+only screen and (max-width: 767px) {
+  #top-bar .title {
+    float: left;
+
+    /* width: 80px; */
+    /* margin-top: -10px; */
+    /* height: 80px; */
+  }
+
+  #top-bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    text-align: center;
+    font-family: "Verlag A", "Verlag B", sans-serif;
+    background-color: #04224e77;
+    /* background-image: linear-gradient(to right, #ff6227, #ff7800); */
+    color: white;
+  }
+
+  #top-bar .toggle-view a {
+    display: none;
+  }
+
+  #top-bar .title h1 {
+    color: #ffffff;
+    line-height: 2.5rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding-left: 0.2rem;
+    font-family: "Courier New";
+  }
+
+  #top-bar .toggle-view:after {
+    content: "\00a0";
+    line-height: 2rem;
+    width: 1rem;
+    padding: 0 0.5rem;
+    height: 1rem;
+    border: 2px solid grey;
+    cursor: pointer;
+  }
+
+  #top-bar .toggle-view.white:after {
+    background-color: white;
+  }
+
+  #top-bar .toggle-view.black:after {
+    background-color: black;
+  }
+}
+
+/** Full Screen **/
+
+#top-bar .full-screen {
+  float: right;
+  line-height: 2rem;
+}
+
+#top-bar .full-screen i {
+  border: 2px solid grey;
+  padding: 4px;
+  cursor: pointer;
+}
+
+/** User logged **/
+
+@media handheld,
+only screen and (min-width: 767px) {
+  #top-bar .title {
+    float: left;
+    /* width: 100px; */
+    /* margin-top: -10px; */
+    /* height: 100px; */
+  }
+
+  #top-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    font-family: "Verlag A", "Verlag B", sans-serif;
+    background-color: #04224e77;
+    /* background-image: linear-gradient(to right, #ff6227, #ff7800); */
+    color: white;
+  }
+
+  .wrapper_body {
+    padding-top: 10%;
+  }
+
+  #top-bar .user-login .balance-bits {
+    color: white;
+    display: inline-block;
+    padding-right: 2rem;
+    font-family: "Courier New";
+    /* font-size: 2px; */
+  }
+
+  #top-bar .title h1 {
+    color: #ffffff;
+    line-height: 2rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    padding-left: 1rem;
+    font-family: "Courier New";
+  }
+
+  #top-bar .user-login .balance-bits span {
+    line-height: 2rem;
+    /* font-size: 5px; */
+    color: white;
+  }
+
+  #top-bar .user-login .username {
+    display: inline-block;
+    /* font-size: 10px; */
+    padding-right: 2rem;
+  }
+
+  #top-bar .user-login .deposit {
+    display: inline-block;
+    padding-right: 1rem;
+    color: #ffffff;
+    font-size: 19px;
+
+    text-decoration: underline;
+    font-family: "Courier New";
+    font-weight: bold;
+  }
+
+
+  #top-bar .user-login .deposit a {
+    color: #fff;
+  }
+
+  #top-bar .user-login .username a {
+    line-height: 2rem;
+    font-weight: bold;
+    text-decoration: underline;
+
+  }
+}
+
+@media handheld,
+only screen and (max-width: 767px) {
+  #top-bar .user-login .deposit a {
+    color: #ffffff;
+    font-size: 25px;
+    text-decoration: underline;
+
+  }
+
+  #top-bar .user-login .balance-bits {
+    display: inline-block;
+    padding-right: 0.5rem;
+    font-family: "Courier New";
+    text-decoration: underline;
+    color: #ffffff;
+    font-size: 13px;
+  }
+
+  #top-bar .user-login .balance-bits span {
+    line-height: 2rem;
+    font-size: 13px;
+    text-decoration: underline;
+    color: white;
+  }
+
+  #top-bar .user-login .username {
+    display: inline-block;
+    text-decoration: underline;
+    color: #ffffff;
+    padding-right: 0.9rem;
+    font-style: bold;
+  }
+
+  #top-bar .user-login .deposit {
+    display: inline-block;
+    padding-right: 0.4rem;
+    font-size: 20px;
+    color: #ffffff;
+    font-family: "Courier New";
+    font-weight: bold;
+  }
+
+  #top-bar .user-login .username a {
+    font-style: bold;
+    font-size: 25px;
+    color: #ffffff;
+    text-decoration: underline;
+    font-weight: bold;
+  }
+  
+}
+
+
+
+#top-bar .user-login .username a {
+  color: #ffffff;
+}
+
+/** Not logged user **/
+
+#top-bar .user-login .register {
+  display: inline-block;
+  color: white;
+  text-decoration: underline;
+
+  padding-right: 1rem;
+}
+
+#top-bar .user-login .register a {
+  color: white;
+}
+
+#top-bar .user-login .login {
+  display: inline-block;
+  text-decoration: underline;
+
+  padding-right: 2rem;
+}
+
+#top-bar .user-login .login a {
+  line-height: 2rem;
+  color: white;
+  text-decoration: underline;
+
+}
