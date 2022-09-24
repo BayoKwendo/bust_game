@@ -500,7 +500,7 @@ exports.smsPlay = function (req, res, next) {
             // console.log(str.replace(" ", '').toUpperCase())
 
             var mTwoKeyword = mdepostString.replace(" ", '').toUpperCase();
-            var mThreeWord= mdeposttHREEString.replace(" ", '').toUpperCase();
+            var mThreeWord = mdeposttHREEString.replace(" ", '').toUpperCase();
 
             var mTwoKeywordTwo = mdepostStringFirst.replace(" ", '').toUpperCase();
 
@@ -647,7 +647,7 @@ exports.smsPlay = function (req, res, next) {
 
                 console.log("withdraw request  ", mwithdraw)
 
-            } else if (mTwoKeyword == 'BL' || mThreeWord == 'BAL' ) {
+            } else if (mTwoKeyword == 'BL' || mThreeWord == 'BAL') {
                 // var mbalance = str.replace(/[^0-9]/g, '')
                 database.getGameLogs(function (err, resp) {
                     if (err) {
@@ -1827,8 +1827,8 @@ exports.handleWithdrawRequestAgency = function (req, res, next) {
                 else if (err === 'FUNDING_QUEUED')
                     return res.render('withdraw-request', { user: user, id: stringGen(10), success: 'Your transaction is being processed come back later to see the status.' });
                 else
-     /* color: white; */
-     return next(new Error('Unable to withdraw: ' + err));
+                    /* color: white; */
+                    return next(new Error('Unable to withdraw: ' + err));
             }
 
             request.post({
@@ -2029,53 +2029,6 @@ function handleWithdrawRequest(user, amount, msisdn, withdrawal_id) {
                     }
                     else {
 
-                        request.post({
-                            rejectUnauthorized: false,
-                            headers: { 'content-type': 'application/json' },
-                            url: 'https://52.19.9.5:8081/mpesa/api.php',
-                            json: {
-                                'username': 'lucky',
-                                'password': 'lucky',
-                                'msisdn': destination,
-                                'amount': net_amount,
-                                'tran_id': withdrawalId,
-                                'b2caccount': 'luckybox'
-                            }
-                        }, function (error, response, body) {
-                            // console.log("result", body)
-                            //let result = JSON.parse(body)
-                            if (body) {
-                                var messa = `Your withdrawal of ${formatDecimals(amount)} request was successfully!.\n-\n\nLast Krashpoints:\n1. ${resp[1].game_crash}\n2. ${resp[2].game_crash}\n3. ${resp[3].game_crash}\n4. ${resp[4].game_crash}\n5. ${resp[5].game_crash}\n\nHelpDesk: ${config.HOTLINE}`
-                                request.post({
-                                    headers: { 'content-type': 'application/json', 'Authorization': '' },
-                                    url: SMS_URL,
-                                    json: {
-                                        "msisdn": `${msisdn}`,
-                                        "message": messa,
-                                    }
-                                }, function (error, response, body) {
-                                    console.log(body)
-                                    console.error(error)
-                                })
-                                database.addOutgoingSMS(user.id, messa, function (err, user) {
-                                })
-                            } else {
-                                var messa = `Your withdraw request fail. Try again\n-\n\nLast Krashpoints:\n1. ${resp[1].game_crash}\n2. ${resp[2].game_crash}\n3. ${resp[3].game_crash}\n4. ${resp[4].game_crash}\n5. ${resp[5].game_crash}\n\n\nSms B<AMOUNT>*<BUSTOUT/> point to 29304 now!\n\nEg send B100*1.5 to 29304.\n or Visit https://luckybust.co.ke/ to PLAY & WIN upto 100X your amount.\n\nHelpDesk: ${config.HOTLINE}`
-                                request.post({
-                                    headers: { 'content-type': 'application/json', 'Authorization': '' },
-                                    url: SMS_URL,
-                                    json: {
-                                        "msisdn": `${msisdn}`,
-                                        "message": messa,
-                                    }
-                                }, function (error, response, body) {
-                                    console.log(body)
-                                    console.error(error)
-                                })
-                                database.addOutgoingSMS(user.id, messa, function (err, user) {
-                                })
-                            };
-                        })
                     }
 
 
@@ -2182,28 +2135,7 @@ exports.handleWithdrawRequest = function (req, res, next) {
                 else
                     return next(new Error('Unable to withdraw: ' + err));
             } else {
-                request.post({
-                    rejectUnauthorized: false,
-                    headers: { 'content-type': 'application/json' },
-                    url: 'https://52.19.9.5:8081/mpesa/api.php',
-                    json: {
-                        'username': 'lucky',
-                        'password': 'lucky',
-                        'msisdn': destination,
-                        'amount': net_amount,
-                        'tran_id': withdrawalId,
-                        'b2caccount': 'luckybox'
-                    }
-                }, function (error, response, body) {
-                    // console.log("result", body)
-                    //let result = JSON.parse(body)
-                    if (body) {
-                        return res.redirect('/');
-                    } else {
-                        return res.render('withdraw-request', { user: user, id: uuid.v4(), error: 'Withdrawal failed!' });
-                    };
-                })
-
+                return res.render('withdraw-request', { user: user, id: uuid.v4(), error: 'Withdrawal failed!' });
             }
         });
     });
@@ -2426,29 +2358,6 @@ exports.confirmWithdrawal = function (req, res, next) {
 //         });
 
 //         // console.log(data)
-
-//         withdraw(req.user.id, net_amount, destination, withdrawalId, withdrawl_charges, function (err) {
-//             if (err) {
-//                 if (err === 'NOT_ENOUGH_MONEY')
-//                     return res.render('withdraw-request', { user: user, id: uuid.v4(), warning: 'Not enough money to process withdraw.' });
-//                 else if (err === 'PENDING')
-//                     return res.render('withdraw-request', { user: user, id: uuid.v4(), success: 'Withdrawal successful, however hot wallet was empty. Withdrawal will be reviewed and sent ASAP' });
-//                 else if (err === 'SAME_WITHDRAWAL_ID')
-//                     return res.render('withdraw-request', { user: user, id: uuid.v4(), warning: 'Please reload your page, it looks like you tried to make the same transaction twice.' });
-//                 else if (err === 'FUNDING_QUEUED')
-//                     return res.render('withdraw-request', { user: user, id: uuid.v4(), success: 'Your transaction is being processed come back later to see the status.' });
-//                 else
-//                     return next(new Error('Unable to withdraw: ' + err));
-//             }
-
-//             data = JSON.stringify({
-//                 'username': 'lucky',
-//                 'password': 'lucky',
-//                 'msisdn': destination,
-//                 'amount': net_amount,
-//                 'tran_id': withdrawalId,
-//                 'b2caccount': 'luckybox'
-//             })
 
 
 //             var json_obj = JSON.parse(data);

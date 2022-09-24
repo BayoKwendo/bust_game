@@ -1,20 +1,20 @@
 
 
 services:
-  game_service:
+  game_service_v2:
     restart: always
     network_mode: host
     build:
       context: ./game_server
       dockerfile: Dockerfile
-    container_name: game_service
+    container_name: game_service_v2
      
-  web_service:
+  web_service_v2:
     restart: always
     network_mode: host
     build:
-      context: ./web_server
+      context: ./web_serve
       dockerfile: Dockerfile
-    container_name: web_service
+    container_name: web_service_v2
   
  
