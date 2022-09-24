@@ -1,7 +1,7 @@
 
 
 services:
-  game_server_two:
+  game_server:
     restart: always
     network_mode: host
     build:
@@ -9,12 +9,12 @@ services:
       dockerfile: Dockerfile
     container_name: game_service_two
      
-  web_server_two:
-    restart: always
-    network_mode: host
-    build:
-      context: ./web_serve
-      dockerfile: Dockerfile
-    container_name: web_service_two
+  # web_server_two:
+  #   restart: always
+  #   network_mode: host
+  #   build:
+  #     context: ./web_serve
+  #     dockerfile: Dockerfile
+  #   container_name: web_service_two
   
  
