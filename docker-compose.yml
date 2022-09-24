@@ -5,7 +5,7 @@ services:
     restart: always
     network_mode: host
     build:
-      context: ./game_serv_v2
+      context: ./game_server
       dockerfile: Dockerfile
     container_name: game_service_v2
      
