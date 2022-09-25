@@ -17,9 +17,9 @@ define([
     _.extend(this, Events);
 
     // self.ws = io("https://luckybox.ng:3844/");
-    // self.ws = io(AppConstants.Engine.HOST);
+    self.ws = io(AppConstants.Engine.HOST);
 
-    self.ws = io("http://localhost:3846/");
+    // self.ws = io("http://localhost:3846/");
 
     //Dev functions
     //window.disconnect = function() {
