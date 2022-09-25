@@ -4,7 +4,7 @@ module.exports = {
   HTTPS_KEY: process.env.HTTPS_KEY || "./key.pem",
   HTTPS_CERT: process.env.HTTPS_CERT || "./cert.pem",
   HTTPS_CA: process.env.HTTPS_CA,
-  DATABASE_URL: "postgres://supabasta:xAs9cMddjjv#@CNu_fEGg@localhost:5432/supabastadb",
+  DATABASE_URL: "postgres://supabasta:xAs9cMddjjv#@CNu_fEGg@localhost/supabastadb",
   ENC_KEY: process.env.ENC_KEY || "devkey",
   SMS_URL: "http://0.0.0.0:1410/autoresponse",
   HOTLINE: "0703012900",
