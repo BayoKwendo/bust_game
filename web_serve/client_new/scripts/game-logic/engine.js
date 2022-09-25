@@ -16,8 +16,8 @@ define([
      */
     _.extend(this, Events);
 
-    // self.ws = io("https://luckybox.ng:3844/");
-    self.ws = io(AppConstants.Engine.HOST);
+    self.ws = io("https://play.supabasta.com/test_game_server/");
+    // self.ws = io(AppConstants.Engine.HOST);
 
     // self.ws = io("http://localhost:3846/");
 
