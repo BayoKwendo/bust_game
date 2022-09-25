@@ -16,7 +16,7 @@ define([
      */
     _.extend(this, Events);
 
-    self.ws = io("https://play.supabasta.com/");
+    self.ws = io("https://test.bayokwendo.dev/");
     // self.ws = io(AppConstants.Engine.HOST);
 
     // self.ws = io("http://localhost:3846/");
