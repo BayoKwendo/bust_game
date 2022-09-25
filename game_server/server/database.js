@@ -181,7 +181,7 @@ exports.getLastGameInfo = function (callback) {
             });
         }
         console.log(id)
-        query('SELECT hash FROM game_hashes WHERE game_id = $1', [id], function (err, results) {
+        query('SELECT hash FROM game_hashes WHERE game_id = $1 limit 1', [id], function (err, results) {
             if (err) return callback(err);
 
             assert(results.rows.length === 1);
@@ -503,7 +503,7 @@ exports.createGame = function (gameId, callback) {
     assert(typeof callback === 'function');
 
 
-    query('SELECT hash FROM game_hashes WHERE game_id = $1', [gameId], function (err, results) {
+    query('SELECT hash FROM game_hashes WHERE game_id = $1 limit 1', [gameId], function (err, results) {
         if (err) return callback(err);
 
         if (results.rows.length !== 1) {
@@ -712,7 +712,7 @@ exports.getBankroll = function (callback) {
 exports.getGameHistory = function (callback) {
 
     var sql =
-        'SELECT games.id game_id, (games.game_crash/100) game_crash, games.created, games.game_no,(SELECT hash FROM game_hashes WHERE game_id = games.id),(SELECT to_json(array_agg(to_json(pv)))  FROM (SELECT username, bet, (1 * cash_out / bet) AS stopped_at, plays.bonus  FROM plays INNER JOIN users ON user_id = users.id WHERE game_id = games.id) pv) player_info FROM games  INNER JOIN plays on games.id = plays.game_id WHERE games.ended = true ORDER BY games.id DESC LIMIT 10;';
+        'SELECT games.id game_id, (games.game_crash/100) game_crash, games.created, games.game_no,(SELECT hash FROM game_hashes WHERE game_id = games.id limit 1),(SELECT to_json(array_agg(to_json(pv)))  FROM (SELECT username, bet, (1 * cash_out / bet) AS stopped_at, plays.bonus  FROM plays INNER JOIN users ON user_id = users.id WHERE game_id = games.id) pv) player_info FROM games  INNER JOIN plays on games.id = plays.game_id WHERE games.ended = true ORDER BY games.id DESC LIMIT 10;';
     query(sql, function (err, data) {
         if (err) throw err;
 
@@ -739,7 +739,7 @@ exports.getGameHistory1 = function (uid, callback) {
     console.log("test", uid)
     var sql =
         ' SELECT games.id game_id, games.game_crash, games.created, games.game_no, ' +
-        '(SELECT hash FROM game_hashes WHERE game_id = games.id), ' +
+        '(SELECT hash FROM game_hashes WHERE game_id = games.id limit 1), ' +
         '(SELECT to_json(array_agg(to_json(pv))) ' +
         ' FROM (SELECT username, bet, (1 * cash_out / bet) AS stopped_at, plays.bonus ' +
         ' FROM plays JOIN users ON user_id = users.id WHERE game_id = games.id ) pv) player_info ' +
