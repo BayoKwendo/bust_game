@@ -796,7 +796,7 @@ exports.addQueueSMS = function (origin, destination, message, callback) {
 
 
 exports.addQueueSTK = function (reference, msisdn, amount, account_no, message, callback) {
-    var sql = 'INSERT INTO stk_queue(reference, msisdn, amount, narrative) values($1, $2, $3)';
+    var sql = 'INSERT INTO stk_queue(reference, msisdn, amount, account_no, narrative) values($1, $2, $3, $4, $5)';
     query(sql, [reference, msisdn, amount, account_no, message], function (err, res) {
         if (err)
         return callback(err);
