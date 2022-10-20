@@ -223,7 +223,7 @@ module.exports = function (app) {
         return res.render('error');
     });
 
-    app.post('/request', restrict, user.giveawayRequest);
+    app.post('/request', restrict, user.depositRequest);
     app.post('/sent-reset', user.resetPasswordRecovery);
     app.post('/sent-recover', user.sendPasswordRecover);
     app.post('/reset-password', restrict, user.resetPassword);
