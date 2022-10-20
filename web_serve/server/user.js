@@ -1083,7 +1083,7 @@ exports.depositRequest = function (req, res, next) {
     
     let message = 'deposit request success'
 
-    database.addQueueSTK(ref, msisdn, req.body.amount, user.id, message, function (err, user) {
+    database.addQueueSTK(ref, user.msisdn, req.body.amount, user.id, message, function (err, user) {
         return res.redirect('/');
         
     })
