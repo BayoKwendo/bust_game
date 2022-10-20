@@ -1178,16 +1178,6 @@ exports.giveawayRequest = function (req, res, next) {
 
 
 exports.confirmDeposit = function (req, res, next) {
-
-    // console.log(req)
-    // // req.body.account, , req.body.amount
-    // if (req.body.status == 'success') {
-    //     database.updatefailed(req.body.transaction_id, req.body.description, function (err) {
-    //         if (err) res.status(500).json({ success: false, message: 'Sorry, ' + err });
-    //         res.status(200).json({ success: true, message: 'Success!' });
-    //     });
-    // } else
-
     if (req.body.status == 'success') {
 
         console.log("account no", req.body)
@@ -1196,20 +1186,6 @@ exports.confirmDeposit = function (req, res, next) {
             res.status(200).json({ success: true, message: 'Success!' });
         });
     }
-
-
-
-    // console.log(req)
-    // if (req.body.status == 'success') {
-    //     // console.log("here")
-    //     database.addDeposit(req.body.reference, req.body.transaction_id, req.body.amount, function (err) {
-    //         if (err) res.status(500).json({ success: false, message: 'Sorry, ' + err });
-    //         res.status(200).json({ success: true, message: 'Success!' });
-    //     });
-    // }
-    // else {
-    // }
-
 };
 
 
@@ -1895,7 +1871,6 @@ function handleWithdrawRequest(user, amount, msisdn, withdrawal_id) {
     assert(Number.isFinite(amount));
 
     var minWithdraw = config.MINING_FEE;
-
 
     database.getGameLogs(function (err, resp) {
 
