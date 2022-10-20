@@ -234,7 +234,6 @@ module.exports = function (app) {
     app.post('/add_advert', user.addLinkAdverts);
     app.post('/withdraw-request', restrict, user.handleWithdrawRequest);
 
-    app.post('/withdraw-request_agency', restrict, user.handleWithdrawRequestAgency);
 
 
     app.post('/support', restrict, contact('support'));
