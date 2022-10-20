@@ -585,74 +585,40 @@ exports.calculateStake = function (gameId, gameCrash, callback) {
                                     query('INSERT INTO basket_log (amount, game_id, balance, narrative) VALUES($1, $2, $3, $4)',
                                         [basket_amount, gameId, basket_balance, `${basket_amount} added to the basket:- game id ${gameId}`], function (err) { // insert into basket logs
                                             if (err) return callback(err);
-                                            // query('SELECT (ROUND(wallet_balance::numeric,2) + ROUND(withdrawal::numeric,2) + ROUND(commission_balance::numeric,2)) as customer_holding, ROUND(deposit::numeric,2) as total_deposit from (select sum(balance_satoshis) as wallet_balance, sum(referred_income) as commission_balance, sum(total_withdrawal) as withdrawal, sum(total_deposit) as deposit from users) as tb_one;', function (err, resp) { // get holdings
-                                            //     if (err) return callback(err);
 
-                                            //     var customer_withdrawal = resp.rows[0].customer_holding;
-                                            //     var total_deposit = resp.rows[0].total_deposit;
+                                            if (basket_balance > total_wining) {   // if amount in the bassket is enough than all possible cashing
 
-                                            //     console.log("customer_holding", customer_withdrawal)
-                                            //     console.log("total_deposit", total_deposit)
-
-                                            //     var balance = (config.THRESHHOLD * total_deposit) - (customer_withdrawal)
-
-
-                                            //     console.log("70 percent", config.THRESHHOLD * total_deposit)
-                                            //     console.log("total wining and with", customer_withdrawal)
-
-                                            //     console.log("new balance", balance)
-
-                                            //     console.log("total winnings", total_wining)
-
-                                            //     var new_crash = balance / (total_stake);
-
-                                            //     console.log("new crash", new_crash)
-
-
-                                            //     if ((customer_withdrawal) <= (config.THRESHHOLD * total_deposit)) {
-
-
-                                            //         var balance = (config.THRESHHOLD * total_deposit) - (customer_withdrawal)
-
-
-                                            //         var new_crash = balance / total_stake;
-
-
-                                            //         if (new_crash < 1 || balance < 1) {
-                                            //             new_crashpoint = 1.02
-                                            //         } else {
-                                            //             if (new_crash <= gameCrash) {
-                                            //                 new_crashpoint = new_crash;  // game crash remain as per crypto
-                                            //             } else {
-                                            //                 new_crashpoint = gameCrash;  // game crash remain as per crypto
-                                            //             }
-                                            //         }
-                                            //     } else {
-                                            //         new_crashpoint = 1.02
-                                            //         // new_crashpoint = gameCrash;
-                                            //     }
-
-                                            // total_wining = 40
-                                            // basket = 37.5 
-                                            // if (basket_balance > total_wining) {   // if amount in the bassket is enough than all possible cashing
-                                            // gameCrash = basket_balance/total_wining;
-                                            // } else {
-                                            //     var point = basket_balance / total_stake;
-
-                                            //     if (point <= 1) {
-
-                                            //         new_crashpoint = 1.01;
-
-                                            //     } else {
-                                            //         new_crashpoint = point
-                                            //     }
-                                            // }
-
-                                            if (gameCrash > 100) {
-                                                new_crashpoint = 100
+                                                // console.info("baskets total winning " + basket_balance + "  " + total_wining)
+                                                gameCrash = basket_balance / total_wining;
+                                                if (gameCrash > 5) {
+                                                    new_crashpoint = 5
+                                                } else {
+                                                    new_crashpoint = gameCrash
+                                                }
+                                                // console.info("gamecrasg ", gameCrash)
                                             } else {
-                                                new_crashpoint = gameCrash
+                                                var point = basket_balance / total_stake;
+
+                                                console.info("baskets stake " + basket_balance + "  " + total_stake)
+
+                                                console.info("point ", point)
+
+                                                if (point <= 1) {
+
+                                                    new_crashpoint = 1.01;  // 
+
+                                                } else {
+                                                    // new_crashpoint = point
+                                                    if (point > 5) {  // greater than handred
+                                                        new_crashpoint = 5
+                                                    } else {
+                                                        new_crashpoint = point
+                                                    }
+                                                }
                                             }
+
+
+
 
 
                                             console.log("new crashpoint", new_crashpoint)
