@@ -1384,7 +1384,10 @@ exports.sendPasswordRecover = function (req, res, next) {
         
         let message = `${val} is your new pin.`
         database.addQueueSMS(0, msisdn, message, function (err, user) {
-            
+                console.log("error", err)
+
+            // if (err) return res.render('forgot-password', { warning: 'Password reset failed' });
+
             // return res.render('withdraw-request', { user: user, success: 'Withdrawal request initiated successful!' });
             database.updatepasswrod(msisdn, val, `${val} is your new pin`, function (err) {
                 // console.log("error", err)
