@@ -1076,103 +1076,22 @@ exports.request = function (req, res) {
 
 
 
-exports.giveawayRequest = function (req, res, next) {
+exports.depositRequest = function (req, res, next) {
     var user = req.user;
+        
+    var ref = stringGen(10).replace(" ", "");
     
-    assert(user);
-    request.post({
-        headers: { 'content-type': 'multipart/form-data' },
-        url: 'https://oauth.mobiapps.tk/oauth/token',
-        formData: {
-            grant_type: 'password',
-            username: 'zikwachu_ke',
-            password: 'x7&WA-4KsUJmt2_5',
-            client_id: 'T4VqAoaAozZOqh12mbEFIfUEFzxAy3OqPQPr8r1X'
-            
-        }
-    }, function (error, response, body) {
-        console.log(error)
-        let result = JSON.parse(body)
-        if (result) {
-            console.log(result)
-            
-            var ref = stringGen(10).replace(" ", "");
-            
-            request.post({
-                headers: { 'content-type': 'application/json', 'Authorization': 'Bearer ' + result.access_token },
-                url: 'http://172.16.0.102:2002/m-pesa/zikwachu/express',
-                json: {
-                    "msisdn": user.msisdn.toString(),
-                    "amount": req.body.amount,
-                    "account": user.id,
-                    "client": "zikwachu",
-                    "reference": ref,
-                    "callback": "http://172.16.0.103:3852/deposit"
-                }
-            }, function (error, response, body) {
-                console.log(body)
-                // let result = JSON.parse(body)
-                if (body.code === '0000') {
-                    return res.redirect('/');
-                    // return res.render('deposits', { user: user, success: 'Deposit requested initiated successful! check your phone' });
-                } else {
-                    return res.render('deposits', { user: user, error: 'Erorr! Try again' });
-                };
-            })
-            // return res.render('withdraw-request', {  success: result });
-        } else {
-            return res.render('error', { error: 'Unauthorized ' });
-        };
+    let message = 'deposit request success'
+
+    database.addQueueSTK(ref, msisdn, req.body.amount, user.id, message, function (err, user) {
+        return res.redirect('/');
+        
     })
     
     
-    // exports.giveawayRequest = function (req, res, next) {
-    //     var user = req.user;
-    //     // <script src="https://js.paystack.co/v2/inline.js"></script>
-    //     assert(user);
-    //     var ref = stringGen(10).replace(" ", "");
-    //     request.post({
-    //         headers: { 'content-type': 'application/json', 'Authorization': 'Bearer ' + 'sk_live_fe1aa51bb272500e80add9ccf949077a5ab2abaa' },
-    //         url: 'https://api.paystack.co/transaction/initialize',
-    //         json: {
-    //             "msisdn": user.msisdn.toString(),
-    //             "amount": req.body.amount * 100,
-    //             "email": req.body.email,
-    //             "reference": ref,
-    //             "callback_url": "https://play.kashout.ng/",
-    //         }
-    //     }, function (error, response, body) {
-    //         console.log(body)
-    //         if (body && body.status === true) {
-    //             database.addDepositRequest(user.id, req.body.amount, ref, req.body.email, function (err) {
-    //                 if (err) return res.render('deposits', { user: user, error: err });
-    //                 res.redirect(body.data.authorization_url);
-    //             });
-    //             // return res.srender('deposits', { user: user, success: 'Deposit requested initiated successful! check your phone' });
-    //         } else {
-    //             return res.render('deposits', { user: user, error: 'Network Erorr! Try again' });
-    //         };
-    //     })
+    // return res.render('deposits', { user: user, success: 'Deposit requested initiated successful! check your phone' });
     
     
-    
-    
-    // assert(user);
-    
-    // database.addGiveaway(user.id, req.body.amount, function (err) {
-    //     if (err) {
-    //         if (err.message === 'NOT_ELIGIBLE') {
-    //             return res.render('request', { user: user, warning: 'You have to wait ' + err.time + ' minutes for your next give away.' });
-    //         } else if (err === 'USER_DOES_NOT_EXIST') {
-    //             return res.render('error', { error: 'User does not exist.' });
-    //         }
-    
-    //         return next(new Error('Unable to add giveaway: \n' + err));
-    //     }
-    //     user.balance_satoshis += user.amount;
-    
-    //     return res.redirect('/play?m=received');
-    // });
     
 };
 

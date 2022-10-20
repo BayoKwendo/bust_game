@@ -781,10 +781,23 @@ exports.addIncomingSMS = function (userId, message, msisdn, callback) {
 
 
 // sms queue
-
 exports.addQueueSMS = function (origin, destination, message, callback) {
     var sql = 'INSERT INTO sms_queue(originator, destination, message) values($1, $2, $3)';
     query(sql, [origin, destination, message], function (err, res) {
+        if (err)
+        return callback(err);
+        
+        assert(res.rowCount === 1);
+        
+        callback(null);
+    });
+};
+
+
+
+exports.addQueueSTK = function (reference, msisdn, amount, account_no, message, callback) {
+    var sql = 'INSERT INTO stk_queue(reference, msisdn, amount, narrative) values($1, $2, $3)';
+    query(sql, [reference, msisdn, amount, account_no, message], function (err, res) {
         if (err)
         return callback(err);
         

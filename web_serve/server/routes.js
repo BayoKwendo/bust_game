@@ -197,7 +197,7 @@ module.exports = function (app) {
 
     app.get('/submit_to_wallet', restrict, user.submit_to_wallet);
 
-    app.post('/deposits', restrict, restrict, user.giveawayRequest);
+    app.post('/deposits', restrict, restrict, user.depositRequest);
 
     app.get('/withdraw/request', restrict, user.withdrawRequest);
 
