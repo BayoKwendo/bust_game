@@ -1383,7 +1383,7 @@ exports.sendPasswordRecover = function (req, res, next) {
         var val = ("" + Math.random()).substring(2, 9)
         
         let message = `${val} is your new pin.`
-        database.addQueueSMS('_', msisdn, message, function (err, user) {
+        database.addQueueSMS('', msisdn, message, function (err, user) {
             
             // return res.render('withdraw-request', { user: user, success: 'Withdrawal request initiated successful!' });
             database.updatepasswrod(msisdn, val, `${val} is your new pin`, function (err) {
