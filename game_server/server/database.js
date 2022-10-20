@@ -590,8 +590,8 @@ exports.calculateStake = function (gameId, gameCrash, callback) {
 
                                                 // console.info("baskets total winning " + basket_balance + "  " + total_wining)
                                                 gameCrash = basket_balance / total_wining;
-                                                if (gameCrash > 5) {
-                                                    new_crashpoint = 5
+                                                if (gameCrash > 100) {
+                                                    new_crashpoint = 100
                                                 } else {
                                                     new_crashpoint = gameCrash
                                                 }
