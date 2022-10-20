@@ -606,7 +606,7 @@ exports.calculateStake = function (gameId, gameCrash, callback) {
                                                 if (point <= 1) {
 
                                                     new_crashpoint = 1.01;  // 
-
+                                                
                                                 } else {
                                                     // new_crashpoint = point
                                                     if (point > 100) {  // greater than handred
