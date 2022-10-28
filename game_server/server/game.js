@@ -5,6 +5,7 @@ var events = require('events');
 var util = require('util');
 var request = require('request');
 
+
 var _ = require('lodash');
 var lib = require('./lib');
 var SortedArray = require('./sorted_array');
@@ -358,26 +359,6 @@ function Game(lastGameId, lastHash, bankroll, gameHistory) {
         at1 = at1 / 100
         var at = arrayAt[index2];
         
-        
-        
-        /*
-        var tmp1 = Number(index2);
-        var tmp2 = Number(countVal%20);
-        var compare = Number(rnd20[tmp1][tmp2]);
-        
-        if(compare == 2 || compare == 3 || compare == 7 || compare == 10  || compare == 13 || compare == 16 || compare == 18)
-        {
-            var min = Number(virUser1.virbetval) - (Number(virUser1.virbetval) - 100 ) * 0.35; 
-            var max = Number(virUser1.virbetval);
-            at = Math.floor(Math.random() * (max -min) + min);
-        }
-        else {
-            var min = 101;
-            var max = Number(virUser1.virbetval) - (Number(virUser1.virbetval) - 100 ) * 0.35;
-            at = Math.floor(Math.random() * (max -min) + min);
-        }
-        */
-        
         if (at1 < at) {
             index2++;
             
@@ -401,12 +382,6 @@ function Game(lastGameId, lastHash, bankroll, gameHistory) {
             return;
         }
         
-        
-        /*if (play.autoCashOut <= at)
-        at = play.autoCashOut;
-        
-        if (self.forcePoint <= at)
-        at = self.forcePoint;*/
         
         if (at1 > self.crashPoint) return;
         
@@ -525,21 +500,20 @@ function Game(lastGameId, lastHash, bankroll, gameHistory) {
                                 console.log('Error inserting to bet log', err);
                             }
 
-                            var messa = `Oh no! You lost!\n\nBet Amount: ${formatDecimals(record.bet)}\nBustout Point: ${record.autoCashOut}\n-\nGame Bust point: ${self.crashPoint}\n-\nWallet Balance : ${formatDecimals(record.user.balance)}\n-\nPLAY AGAIN NOW to WIN\n\nSms BAmount*BUSTOUT to 29304,\nEg\nK50*1.25\n\nLast BustPoints:\n1. ${resp[1].game_crash}\n2. ${resp[2].game_crash}\n3. ${resp[3].game_crash}\n4. ${resp[4].game_crash}\n5. ${resp[5].game_crash}\n\n  HelpDesk: ${config.HOTLINE}`
+
+
+                            var messa = util.format(config.SMS_LOST, formatDecimals(record.bet), record.autoCashOut, self.crashPoint, 
+                                formatDecimals(record.user.balance), resp[1].game_crash, resp[2].game_crash, resp[3].game_crash, 
+                                resp[4].game_crash, resp[5].game_crash);
                             
-                            request.post({
-                                headers: { 'content-type': 'application/json', 'Authorization': '' },
-                                url: config.SMS_URL,
-                                json: {
-                                    "msisdn": `${record.user.msisdn}`,
-                                    "message": messa,
-                                }
-                            }, function (error, response, body) {
+                            db.addQueueSMS(record.user.msisdn, config.SENDER_ID, message, function (err, user) {
+                            
                                
-                            })
+                          
                             
                             db.addOutgoingSMS(record.user.id, messa, function (err, user) {
                             })
+                        })
     
                             // console.log(resp)
                             // // return;
@@ -788,8 +762,6 @@ Game.prototype.runCashOuts = function (at) {
         assert(play.status === 'PLAYING');
         assert(play.autoCashOut);
         
-        
-        
         //console.log('Game.prototype.playerUserName', playerUserName);
         //console.log('Game.prototype.runCashOuts', play.autoCashOutChk);
         
@@ -809,22 +781,14 @@ Game.prototype.runCashOuts = function (at) {
                     }
                     // console.log(resp)
                     // // return; 
-                    var messa = `CONGRATULATION! You won!\n\nBet Amount: ${formatDecimals(play.bet)}\nBustout Point: ${play.autoCashOut}\n-\nGame Bustout point: ${self.crashPoint}\n-\nYour WINNING: ${formatDecimals(play.bet  * play.autoCashOut)}.\n-\nWallet Balance : ${formatDecimals(play.user.balance +  (play.bet  * play.autoCashOut))}\n-\nPLAY AGAIN NOW to WIN more cash.\n\nSms BAmount*Bustout Point to 29304,\nEg\nB50*1.25\n\nLast BustPoints:\n1. ${resp[1].game_crash}\n2. ${resp[2].game_crash}\n3. ${resp[3].game_crash}\n4. ${resp[4].game_crash}\n5. ${resp[5].game_crash}\n\n  HelpDesk: ${config.HOTLINE}`
-                    request.post({
-                        headers: { 'content-type': 'application/json', 'Authorization': '' },
-                        url: config.SMS_URL,
-                        json: {
-                            "msisdn": `${play.user.msisdn}`,
-                            "message": messa,
-                        }
-                    }, function (error, response, body) {
-                        console.log(body)
-                        console.error(error)
+                    var message =   util.format(config.SMS_CONGRATS, formatDecimals(play.bet), play.autoCashOut, self.crashPoint, 
+                        formatDecimals(play.bet  * play.autoCashOut), formatDecimals(play.user.balance +  (play.bet  * play.autoCashOut)),
+                         resp[1].game_crash, resp[2].game_crash, resp[3].game_crash, resp[4].game_crash, resp[5].game_crash)
+                    
+                    db.addQueueSMS(msisdn, config.SENDER_ID, message, function (err, user) {
+                        db.addOutgoingSMS(play.user.id, messa, function (err, user) {
+                        })
                     })
-
-                    db.addOutgoingSMS(play.user.id, messa, function (err, user) {
-                    })
-
                     
                 });
             }
@@ -1063,8 +1027,6 @@ function calcBonuses(input) {
     }
     
     
-    
-    
     Game.prototype.placeBetSMS = function (betAmount, autoCashOut, user_id, msisdn, playing, user) {
         var self = this;
         
@@ -1110,27 +1072,7 @@ function calcBonuses(input) {
                 })
                 
             });
-        } 
-        // else {
-        //     // you have an active game going on
-        //     db.getGameLogs(function (err, resp) {
-        //         if (err){
-        //             console.log('Error inserting to bet log', err);
-        //         }
-                
-        //         request.post({
-        //             headers: { 'content-type': 'application/json', 'Authorization': '' },
-        //             url: config.SMS_URL,
-        //             json: {
-        //                 "msisdn": `${msisdn}`,
-        //                 "message": `BET ALREADY PLACED.\nWe already confirmed your bet placement:\n-\nBet Amount: ${betAmount}\nAuto-Kashout Point: ${autoCashOut}\n-\nPlease wait for results\n-\n\nLast BustPoints:\n1. ${resp[0].game_crash}\n2. ${resp[1].game_crash}\n3. ${resp[2].game_crash}\n4. ${resp[3].game_crash}\n5. ${resp[4].game_crash}\n\nHelpDesk: ${config.HOTLINE}`,
-        //             }
-        //         }, function (error, response, body) {
-        //             console.log(body)
-        //             console.error(error)
-        //         })
-        //     }) 
-        // }
+        }
     }
     
     

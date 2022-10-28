@@ -13,4 +13,8 @@ module.exports = {
   VIG: 0.1,
   //Do not set any of this on production
   CRASH_AT: process.env.CRASH_AT, //Force the crash point
+  //SMS
+  SMS_CONGRATS: `CONGRATULATION! You won!\n\nBet Amount: %s\nBustout Point: %s\n-\nGame Bustout point: %s\n-\nYour WINNING: %s.\n-\nWallet Balance : %s\n-\nPLAY AGAIN NOW to WIN more cash.\n\nSms BAmount*Bustout Point to 29304,\nEg\nB50*1.25\n\nLast BustPoints:\n1. %s\n2. %s\n3. %s\n4. %s\n5. %s\n\n  HelpDesk: 0110095465`,
+  SMS_LOST: `Oh no! You lost!\n\nBet Amount: %s\nBustout Point: %s\n-\nGame Bust point: %s\n-\nWallet Balance : %s\n-\nPLAY AGAIN NOW to WIN\n\nSms BAmount*BUSTOUT to 29304,\nEg\nK50*1.25\n\nLast BustPoints:\n1. %s\n2. %s\n3. %s\n4. %s\n5. %s\n\n  HelpDesk: 0110095465`,
+                            
 };

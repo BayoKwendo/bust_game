@@ -16,7 +16,7 @@ module.exports = {
     "xpub6AHA9hZDN11k2ijHMeS5QqHx2KP9aMBRhTDqANMnwVtdyw2TDYRmF8PjpvwUFcL1Et8Hj59S3gTSMcUQ5gAqTz3Wd8EsMTmF3DChhqPQBnU",
   AWS_SES_KEY: process.env.AWS_SES_KEY,
   AWS_SES_SECRET: process.env.AWS_SES_SECRET,
-  CONTACT_EMAIL: process.env.CONTACT_EMAIL || "ryan@moneypot.com",
+  CONTACT_EMAIL: process.env.CONTACT_EMAIL || "maureen@mobisphere.com",
   SITE_URL: process.env.SITE_URL || "https://play.SupaBasta.com/",
   GAME_BASEURL: "http://localhost:3846",
   HOTLINE: "0703012900",
@@ -52,4 +52,9 @@ module.exports = {
   RETENTION_FEE: 0.02, // 2 percent
   RETENTION_EXPIRY: 30, // expiry
   BONUS: 50,
+  SENDER_ID: "Mobi Sphere",
+  //Messages
+  SMS_DEPOSIT: `Your deposit of %s has been processed successfully.\nYour wallet balance is %s.\n-\nPlay in the next round and win upto 100 X your bet amount on SuperBust. Go to https://play.supabusta.co.ke/ and be the next winner!\\nHelpDesk: 0110095465.`,
+  SMS_WITHDRAW: `Your withdrawal request of %s has been processed successful.\nYour wallet balance is %s.Kindly note that M-pesa charges apply.\n-\nWIN every second on SuperBust! Go to https://play.supabusta.co.ke/ and be the next winner!\n\nHelpDesk: 0110095465.`,
+  INSUFFICIENT_BAL: `You have insufficient balance to withdraw %s.\nYour wallet Balance is %s\n-\n\n.Visit https://supabusta.co.ke/ to PLAY & WIN upto 100X your amount.\n-\nHelpdesk: 0110095465.`
 };

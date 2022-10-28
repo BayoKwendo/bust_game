@@ -17,19 +17,6 @@ var self = this;
 var assert = require('assert');
 var path = require('path');
 
-// app.post('/place_bet',
-//     function (req, res, next) {
-//         res.status(500).json({  // invalid cashout response
-//             status_code: 500,
-//             status: false,
-//             message: "Invalid CashOut value",
-//         })
-//         console.log("here here", req)
-//         // db.placeBet(betAmount, autoCashOut, user.id, self.gameId, function (err, playId) {
-//         //     // BET PLACE HERE
-//         // });
-//     }
-// )
 
 var server;
 
@@ -60,10 +47,6 @@ if (config.USE_HTTPS) {
                     try {
                         var post = JSON.parse(body);
                         response.writeHead(200, { "Content-Type": "application/json" });
-                        // database.placeBet(betAmount, autoCashOut, user.id, self.gameId, function (err, playId) {
-                        //     // BET PLACE HERE
-                        // });
-                        // console.log("here", ); // <--- here I just output the parsed JSON
                         self.game.placeBetSMS(post.betAmount, post.autoCashOut, post.userID, post.msisdn, post.playing, post.user);
                         response.end('post received')
                         return;

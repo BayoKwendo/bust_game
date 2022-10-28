@@ -5,6 +5,7 @@ var async = require('async');
 var lib = require('./lib');
 var pg = require('pg');
 var config = require('./config');
+var util = require('util');
 
 if (!config.DATABASE_URL)
     throw new Error('must set DATABASE_URL environment var');
@@ -113,56 +114,53 @@ pg.on('error', function (err) {
     console.error('POSTGRES EMITTED AN ERROR', err);
 });
 
-// runner takes (client, callback)
-
-// callback should be called with (err, data)
-// client should not be used to commit, rollback or start a new transaction
-
-// callback takes (err, data)
-
-
-
-
 
 exports.updateBetLogs = function (userId, bet_amount, gameId, callback) {  // update bet logs
 
-    getClient(function (client, callback) {
+    //getClient(function (client, callback) {
+    connect(function (err, client, done) {
+        const shouldAbort = err => {
+            console.error('Error in transaction', err.stack)
+            client.query('ROLLBACK', err => {
+                if (err) {
+                    console.error('Error rolling back client', err.stack)
+                }
+                // release the client back to the pool
+                callback(null)
+            })
+        }
+        client.query('BEGIN', err => {
+            if (err) return shouldAbort(err);
 
-        client.query("SELECT balance_satoshis, referred_income, bonus FROM users_view WHERE id = $1", // update user wallet
-            [userId], function (err, response) {
-                if (err) return callback(err);
-                var mbalance = response.rows[0].balance_satoshis
-                var referral = response.rows[0].referred_income
-                var bonus = response.rows[0].bonus
-                query('INSERT INTO customer_logs_view(user_id, narrative, wallet_balance, referral_income, bonus, actual_balance) VALUES($1,$2,$3,$4,$5,$6)',
-                    [userId, `${bet_amount} loss bet: game id ${gameId}`, mbalance, referral, bonus, (mbalance + referral + bonus)],
-                    function (err, response) {
-                        if (err) return callback(err);
-                        client.query(
-                            'INSERT INTO bet_log_view(user_id, game_id, bet, balance, narrative ) VALUES($1, $2, $3, $4, $5)',
-                            [userId, gameId, bet_amount, mbalance, `Loss bet ${bet_amount}`],
-                            function (err, response) {
-                                if (err) return callback(err);
-                                callback(null)
-                            })
+            client.query("SELECT balance_satoshis, referred_income, bonus FROM users_view WHERE id = $1", // update user wallet
+                [userId], function (err, response) {
+                    if (err) return shouldAbort(err);
+                    var mbalance = response.rows[0].balance_satoshis
+                    var referral = response.rows[0].referred_income
+                    var bonus = response.rows[0].bonus
+                    client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
+                                    VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+                        [userId, ``, `Bet Lost`, 0, 0, mbalance, mbalance, bonus],
+                        function (err, response) {
+                            if (err) return shouldAbort(err);
+                            client.query(
+                                'INSERT INTO bet_log_view(user_id, game_id, bet, balance, narrative ) VALUES($1, $2, $3, $4, $5)',
+                                [userId, gameId, bet_amount, mbalance, `Loss bet ${bet_amount}`],
+                                function (err, response) {
+                                    if (err) return shouldAbort(err);
+                                    client.query('COMMIT', err => {
+                                        callback(null)
+                                    })
+                                })
 
-                    })
-            });
+                        })
+                });
+        })
+    })
 
-        // client.query(
-        //     'SELECT balance_satoshis FROM users WHERE id = $1',
-        //     [userId],
 
-        //     function (err, result) {
-        //         if (err) return callback(new Error('Could not end game, got: ' + err));
+    //}, callback);
 
-        //         var current_balance = result.rows[0].balance_satoshis;
-        //         client.query(
-        //             'INSERT INTO bet_log(user_id, game_id, bet, balance, narrative ) VALUES($1, $2, $3, $4, $5)',
-        //             [userId, gameId, bet_amount, current_balance, `Loss bet ${bet_amount}`], callback)
-        //         callback(null);
-        //     });
-    }, callback);
 };
 
 
@@ -248,34 +246,14 @@ exports.placeBet = function (amount, autoCashOut, userId, gameId, callback) {
 
     getClient(function (client, callback) {
         var tasks = [
+
             function (callback) {
-                client.query('UPDATE users_view SET balance_satoshis = balance_satoshis - $1 WHERE id = $2',
-                    [amount, userId], callback);
-            },
-            function (callback) {
-                client.query(
-                    'INSERT INTO plays_view(user_id, game_id, bet, auto_cash_out) VALUES($1, $2, $3, $4) RETURNING id',
-                    [userId, gameId, amount, autoCashOut], callback);
-            },
-            function (callback) {
-                saveBet(client, userId, amount, gameId, function (err) {
+                processBet(client, userId, amount, gameId, function (err) {
                     if (err)
                         return callback(err);
                     callback(null);
                 })
             },
-            // function (callback) {
-            //     client.query(
-            //         'SELECT balance_satoshis FROM users WHERE id = $1',
-            //         [userId],
-            //         function (err, result) {
-            //             if (err) return callback(new Error('Could not end game, got: ' + err));
-            //             var current_balance = result.rows[0].balance_satoshis;
-            //             client.query(
-            //                 'INSERT INTO bet_log(user_id, game_id, bet, balance, narrative ) VALUES($1, $2, $3, $4, $5)',
-            //                 [userId, gameId, amount, current_balance, `Inititiate bet of ${amount}`], callback)
-            //         })
-            // }
         ];
 
         async.parallel(tasks, function (err, result) {
@@ -378,39 +356,37 @@ function addSatoshis(client, userId, amount, callback) {
     });
 }
 
-function customerlogs(client, userId, amount, mbalance, referral, bonus, callback) {
 
-    client.query('INSERT INTO customer_logs_view(user_id, narrative, wallet_balance, referral_income, bonus, actual_balance) VALUES($1,$2,$3,$4,$5,$6)',
-        [userId, `Cashed out ${amount} total balance ${mbalance}`, mbalance, referral, bonus, (mbalance + referral + bonus)],
-        function (err, response) {
-            callback(null);
-
-        });
-}
-
-
-function saveBet(client, userId, amount, gameId, callback) {
-
+function processBet(client, userId, amount, gameId, callback) {
     client.query("SELECT balance_satoshis, referred_income, bonus FROM users_view WHERE id = $1", // update user wallet
         [userId], function (err, response) {
             if (err) return callback(err);
-            var mbalance = response.rows[0].balance_satoshis
-            var referral = response.rows[0].referred_income
-            var bonus = response.rows[0].bonus
-            query('INSERT INTO customer_logs_view(user_id, narrative, wallet_balance, referral_income, bonus, actual_balance) VALUES($1,$2,$3,$4,$5,$6)',
-                [userId, `${amount} used to place bet: game id ${gameId}`, mbalance, referral, bonus, (mbalance + referral + bonus)],
-                function (err, response) {
-                    if (err) return callback(err);
-                    client.query(
-                        'INSERT INTO bet_log_view(user_id, game_id, bet, balance, narrative ) VALUES($1, $2, $3, $4, $5)',
-                        [userId, gameId, amount, mbalance, `Inititiate bet of ${amount}`],
-                        function (err, response) {
-                            if (err) return callback(err);
-                            callback(null);
-                        })
 
-                })
-        });
+            var balance = response.rows[0].balance_satoshis
+            var bonus = response.rows[0].bonus
+            if (balance >= amount) {
+                query('UPDATE users_view SET balance_satoshis = balance_satoshis - $1 WHERE id = $2',
+                    [amount, userId], function (err, response) {
+                        if (err) return callback(err);
+                        query(
+                            'INSERT INTO plays_view(user_id, game_id, bet, auto_cash_out) VALUES($1, $2, $3, $4) RETURNING id',
+                            [userId, gameId, amount, autoCashOut], function (err, response) {
+                                if (err) return callback(err);
+                                query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
+                                    VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+                                    [userId, ``, `Bet Placed`, amount, 0, balance, (balance - amount), bonus],
+                                    function (err, response) {
+                                        if (err) return callback(err);
+                                        callback(null);
+                                    })
+                            })
+
+
+                    });
+            } else {
+                callback(null);
+            }
+        })
 }
 
 
@@ -422,6 +398,8 @@ exports.cashOut = function (userId, playId, amount, bet_amount, callback) {
     assert(typeof callback === 'function');
 
     getClient(function (client, callback) {
+
+        //To do : add Taxes Amount should be less taxes
         addSatoshis(client, userId, amount, function (err) {
             if (err)
                 return callback(err);
@@ -444,6 +422,8 @@ exports.cashOut = function (userId, playId, amount, bet_amount, callback) {
                         var gameId = results.rows[0].game_id;
                         let mamount = amount;  // update to whole stake
                         // console.log("basket amount ", mamount)
+
+
                         client.query(
                             'UPDATE basket SET amount = amount - $1', [mamount], function (err, result) {   // update busket on winings
                                 if (err) {
@@ -470,19 +450,20 @@ exports.cashOut = function (userId, playId, amount, bet_amount, callback) {
                                                         var mbalance = response.rows[0].balance_satoshis
                                                         var referral = response.rows[0].referred_income
                                                         var bonus = response.rows[0].bonus
+                                                        client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
+                                                            VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+                                                            [userId, ``, `Cash Out`, 0, mamount, (mbalance - mamount), mbalance, bonus],
+                                                            function (err, response) {
+                                                                if (err) return callback(err);
 
-                                                        customerlogs(client, userId, amount, mbalance, referral, bonus, function (err) {
-                                                            if (err)
-                                                                return callback(err);
-
-                                                            client.query(
-                                                                'INSERT INTO bet_log_view(user_id, game_id, bet, cashout, balance, narrative ) VALUES($1, $2, $3, $4, $5, $6)',
-                                                                [userId, gameId, bet_amount, mamount, mbalance, `Cashed out ${amount} total balance ${mbalance}`],
-                                                                function (err, result) {
-                                                                    if (err) return callback(new Error('Could not end game, got: ' + err));
-                                                                    callback(null);
-                                                                });
-                                                        })
+                                                                client.query(
+                                                                    'INSERT INTO bet_log_view(user_id, game_id, bet, cashout, balance, narrative ) VALUES($1, $2, $3, $4, $5, $6)',
+                                                                    [userId, gameId, bet_amount, mamount, mbalance, `Cashed out ${amount} total balance ${mbalance}`],
+                                                                    function (err, result) {
+                                                                        if (err) return callback(new Error('Could not end game, got: ' + err));
+                                                                        callback(null);
+                                                                    });
+                                                            })
                                                     });
 
                                             });
@@ -606,7 +587,7 @@ exports.calculateStake = function (gameId, gameCrash, callback) {
                                                 if (point <= 1) {
 
                                                     new_crashpoint = 1.01;  // 
-                                                
+
                                                 } else {
                                                     // new_crashpoint = point
                                                     if (point > 100) {  // greater than handred
@@ -616,10 +597,6 @@ exports.calculateStake = function (gameId, gameCrash, callback) {
                                                     }
                                                 }
                                             }
-
-
-
-
 
                                             console.log("new crashpoint", new_crashpoint)
                                             return callback(null, { crashPoint: new_crashpoint });
@@ -640,23 +617,6 @@ exports.calculateStake = function (gameId, gameCrash, callback) {
 
 };
 
-/*
-exports.getServerProfit = function(callback) {
-    query('SELECT server_profit FROM money',
-        function(err, results) {
-            if (err) return callback(err);
- 
-            assert(results.rows.length === 1);
- 
-            var profit = results.rows[0].server_profit;
-            assert(typeof profit === 'number');
- 
-            callback(null, profit);
-        }
-    );
- 
-};
-*/
 exports.getBankroll = function (callback) {
     query('SELECT COALESCE(SUM(balance_satoshis), 0) as profit FROM users',
         function (err, results) {

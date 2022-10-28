@@ -10,6 +10,7 @@ var withdraw = require('./withdraw');
 var sendEmail = require('./sendEmail');
 var speakeasy = require('speakeasy');
 var qr = require('qr-image');
+var util = require('util');
 var uuid = require('uuid');
 const { SMS_URL, GAME_BASEURL, INSERT_URL } = require('../config/config');
 
@@ -1837,16 +1838,12 @@ exports.handleWithdrawRequest = function (req, res, next) {
         // console.log("hre", user.balance_satoshis +" "+ (net_amount + mpesa_charges + withholding_tax))
         
         if ((net_amount + mpesa_charges + withholding_tax) > user.balance_satoshis) {
-            var messa = `You have insufficient balance to withdraw ${formatDecimals(net_amount)}.\nYour wallet Balance is ${formatDecimals(user.balance_satoshis)}\n-\n\nSms B<AMOUNT>*<BUSTOUT/> point to 29304 now!\n\nEg send B100*1.5 to 29304.\n or Visit https://luckybust.co.ke/ to PLAY & WIN upto 100X your amount.\n-\nHelpdesk:  ${config.HOTLINE}`
-            request.post({
-                headers: { 'content-type': 'application/json', 'Authorization': '' },
-                url: SMS_URL,
-                json: {
-                    "msisdn": `${user.msisdn}`,
-                    "message": messa,
-                }
-            })
-            database.addOutgoingSMS(user.id, messa, function (err, user) {
+            var message = util.format(config.INSUFFICIENT_BAL, formatDecimals(net_amount), formatDecimals(user.balance_satoshis))
+            database.addQueueSMS(config.SENDER_ID, msisdn, message, function (err, user) {
+                if (err) return callback(err);
+                database.addOutgoingSMS(user.id, messa, function (err, user) {
+
+                })
             })
             
             return res.redirect('/');
@@ -1872,10 +1869,11 @@ exports.handleWithdrawRequest = function (req, res, next) {
                 return res.render('withdraw-request', { user: user, id: uuid.v4(), warning: 'Please reload your page, it looks like you tried to make the same transaction twice.' });
                 else if (err === 'FUNDING_QUEUED')
                 return res.render('withdraw-request', { user: user, id: uuid.v4(), success: 'Your transaction is being processed come back later to see the status.' });
-                else
+                else 
                 return next(new Error('Unable to withdraw: ' + err));
             } else {
-                return res.render('withdraw-request', { user: user, id: uuid.v4(), error: 'Withdrawal failed!' });
+                //queue withdrawal request to Database for processing
+                return res.render('withdraw-request', { user: user, id: uuid.v4(), success: 'Your transaction is being processed come back later to see the status.' });
             }
         });
     });
@@ -1883,139 +1881,6 @@ exports.handleWithdrawRequest = function (req, res, next) {
 
 
 
-// exports.handleWithdrawRequest = function (req, res, next) {
-//     var user = req.user;
-//     assert(user);
-//     var amount = req.body.amount;
-
-//     var destination = user.msisdn;
-//     var withdrawalId = req.body.withdrawal_id.replace(" ", '');
-//     var account_no = req.body.account_no.replace(" ", "");
-//     var bank_code = req.body.bank_code.replace(" ", "");
-//     var bank_name = "";
-//     var password = lib.removeNullsAndTrim(req.body.password);
-//     var otp = lib.removeNullsAndTrim(req.body.otp);
-//     var r = /^[1-9]\d*(\.\d{0,2})?$/;
-//     if (!r.test(amount))
-//         return res.render('withdraw-request', { user: user, id: stringGen(10), warning: 'Not a valid amount' });
-
-//     amount = Math.round(parseFloat(amount));
-
-//     assert(Number.isFinite(amount));
-
-//     var minWithdraw = config.MINING_FEE;
-
-//     console.log("fkjjfjfj" + " " + withdrawalId)
-
-
-
-//     if (amount < minWithdraw)
-//         return res.render('withdraw-request', { user: user, id: stringGen(10), warning: 'You must withdraw ' + minWithdraw + ' or more' });
-//     if (!password)
-//         return res.render('withdraw-request', { user: user, id: stringGen(10), warning: 'Must enter a password' });
-
-
-//     database.validateUser(user.msisdn, password, function (err) {
-
-//         if (err) {
-//             if (err === 'WRONG_PASSWORD')
-//                 return res.render('withdraw-request', { user: user, id: stringGen(10), warning: 'wrong password, try it again...' });
-//             if (err === 'INVALID_OTP')
-//                 return res.render('withdraw-request', { user: user, id: stringGen(10), warning: 'invalid one-time token' });
-//             //Should be an user
-//             return next(new Error('Unable to validate user handling withdrawal: \n' + err));
-//         }
-
-//         var withdrawl_charges = config.WITHDRAWAL_CHARGE
-//         var net_amount = amount; // withdrawal amount
-//         if ((net_amount + withdrawl_charges) >= (user.balance_satoshis + user.referred_income + user.bonus))
-//             return res.render('withdraw-request', { user: user, id: stringGen(10), warning: 'Not enough money to process withdraw' });
-
-
-
-
-//         data = JSON.stringify({
-//             "amount": net_amount,
-//             "reference": withdrawalId
-//         });
-//         // console.log(data)
-//         withdraw(req.user.id, net_amount, withdrawl_charges, destination, withdrawalId, bank_name, bank_code, account_no, function (err) {
-//             console.log("transaction", err)
-//             if (err) {
-//                 if (err === 'NOT_ENOUGH_MONEY')
-//                     return res.render('withdraw-request', { user: user, id: stringGen(10), warning: 'Not enough money to process withdraw.' });
-//                 else if (err === 'PENDING')
-//                     return res.render('withdraw-request', { user: user, id: stringGen(10), success: 'Withdrawal successful, however hot wallet was empty. Withdrawal will be reviewed and sent ASAP' });
-//                 else if (err === 'SAME_WITHDRAWAL_ID')
-//                     return res.render('withdraw-request', { user: user, id: stringGen(10), warning: 'Please reload your page, it looks like you tried to make the same transaction twice.' });
-//                 else if (err === 'FUNDING_QUEUED')
-//                     return res.render('withdraw-request', { user: user, id: stringGen(10), success: 'Your transaction is being processed come back later to see the status.' });
-//                 else
-//                     return next(new Error('Unable to withdraw: ' + err));
-//             }
-
-//             request.post({
-//                 headers: { 'content-type': 'multipart/form-data' },
-//                 url: 'https://oauth.mobiapps.tk/oauth/token',
-//                 formData: {
-//                     grant_type: 'password',
-//                     username: 'zikwachu_ng',
-//                     password: '3AVVfK3@nfFyxLaw',
-//                     client_id: 'r0ZOcitDaLnTIx8NLrjrQK69VXYs3739WeNH6Heo'
-//                 }
-//             }, function (error, response, body) {
-//                 console.log(error)
-//                 let result = JSON.parse(body)
-//                 if (result) {
-//                     console.log({
-//                         "client": "kashout",
-//                         "account_no": account_no,
-//                         "bank_code": bank_code,
-//                         "reason": "Withdrawal",
-//                         "reference": withdrawalId,
-//                         "callback": "https://play.kashout.ng/confirm_withdrawal",
-//                         "amount": req.body.amount,
-//                     })
-
-//                     request.post({
-//                         headers: { 'content-type': 'application/json', 'Authorization': 'Bearer ' + result.access_token },
-//                         url: 'https://payments-ng.mobiapps.tk:8443/paystack/withdraw',
-//                         json: {
-//                             "client": "kashout",
-//                             "account_no": account_no,
-//                             "bank_code": bank_code,
-//                             "reason": "Withdrawal",
-//                             "reference": withdrawalId,
-//                             "callback": "https://play.kashout.ng/confirm_withdrawal",
-//                             "amount": req.body.amount,
-//                         }
-//                     }, function (error, response, body) {
-//                         console.log(body)
-//                         // let result = JSON.parse(body)
-//                         if (body.code === '0000') {
-//                             // return res.render('play', { user: user, success: 'Withdrawal request initiated successful!' });
-//                             return res.redirect('/');
-//                         } else {
-//                             database.updatefailedWithdrawal(withdrawalId, withdrawl_charges, body.message, function (err) {
-//                                 // console.log("error", err)
-//                                 if (err) return res.render('withdraw', { user: user, error: "Withdrawal request failed" });
-//                                 return res.redirect('/withdraw');
-//                             });
-//                         };
-//                     })
-//                     // return res.render('withdraw-request', {  success: result });
-//                 } else {
-//                     database.updatefailedWithdrawal(withdrawalId, withdrawl_charges, "Unauthorized", function (err) {
-//                         if (err) return res.render('error', { error: 'Unauthorized ' });
-//                         return res.render('error', { error: 'Unauthorized ' });
-//                     });
-//                 };
-
-//             })
-
-//         });
-//     })
-// }
 
 
 
@@ -2037,87 +1902,6 @@ exports.confirmWithdrawal = function (req, res, next) {
         
     }
 };
-
-
-
-// exports.handleWithdrawRequest = function (req, res, next) {
-//     var user = req.user;
-//     assert(user);
-
-//     var amount = req.body.amount;
-//     var destination = user.msisdn;
-//     var withdrawalId = req.body.withdrawal_id;
-//     var password = lib.removeNullsAndTrim(req.body.password);
-//     var otp = lib.removeNullsAndTrim(req.body.otp);
-//     var r = /^[1-9]\d*(\.\d{0,2})?$/;
-//     if (!r.test(amount))
-//         return res.render('withdraw-request', { user: user, id: uuid.v4(), warning: 'Not a valid amount' });
-
-//     amount = Math.round(parseFloat(amount));
-
-//     assert(Number.isFinite(amount));
-
-//     var minWithdraw = config.MINING_FEE;
-
-//     // console.log(minWithdraw + " " + amount)
-//     if (amount < minWithdraw)
-//         return res.render('withdraw-request', { user: user, id: uuid.v4(), warning: 'You must withdraw ' + minWithdraw + ' or more' });
-//     if (!password)
-//         return res.render('withdraw-request', { user: user, id: uuid.v4(), warning: 'Must enter a password' });
-
-
-
-//     database.validateUser(user.msisdn, password, otp, function (err) {
-
-//         if (err) {
-//             if (err === 'WRONG_PASSWORD')
-//                 return res.render('withdraw-request', { user: user, id: uuid.v4(), warning: 'wrong password, try it again...' });
-//             if (err === 'INVALID_OTP')
-//                 return res.render('withdraw-request', { user: user, id: uuid.v4(), warning: 'invalid one-time token' });
-//             //Should be an user
-//             return next(new Error('Unable to validate user handling withdrawal: \n' + err));
-//         }
-
-//         // var withholding_tax = config.WITHHOLDING_TAX * amount   // withholding tax amount  
-
-//         // var net_amount_init = amount;
-
-//         var withdrawl_charges = config.WITHDRAWAL_CHARGE
-
-//         var net_amount = amount; // withdrawal amount
-
-//         // console.log("hre", user.balance_satoshis +" "+ (net_amount + mpesa_charges + withholding_tax))
-
-//         if ((net_amount + withdrawl_charges) >= user.balance_satoshis)
-//             return res.render('withdraw-request', { user: user, id: uuid.v4(), warning: 'Not enough money to process withdraw.DDDK' });
-
-
-//         data = JSON.stringify({
-//             "amount": net_amount,
-//             "reference": withdrawalId
-//         });
-
-//         // console.log(data)
-
-
-//             var json_obj = JSON.parse(data);
-//             request.post({
-//                 rejectUnauthorized: false,
-//                 headers: { 'content-type': 'application/json' },
-//             }, function (error, response, body) {
-//                 // console.log("result", body)
-//                 //let result = JSON.parse(body)
-//                 if (body) {
-//                     return res.render('withdraw-request', { user: user, id: uuid.v4(), success: 'Your transaction is being processed come back later to see the status' });
-//                 } else {
-//                     return res.render('withdraw-request', { user: user, id: uuid.v4(), error: 'Withdrawal failed!' });
-//                 };
-//             })
-
-
-//         });
-//     });
-// };
 
 
 exports.handleConfirmWithdrawal = function (req, res, next) {
