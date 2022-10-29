@@ -88,6 +88,18 @@ app.enable('trust proxy');
 /** Serve Static content **/
 var twoWeeksInSeconds = 1209600;
 
+
+var task = cron.schedule('* * * * * *', () =>  {     
+    database.addDeposit(function (err, user) {
+        if (err) {
+            console.log(err)
+        }
+    });
+}, {
+    scheduled: false
+})
+task.start();
+
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store')
     next()
@@ -106,19 +118,6 @@ if (config.PRODUCTION) {
 
 var server = http.createServer(app);
 
-var task = cron.schedule('* * * * * *', () =>  {     
-    // dd()
-    // console.log('console.log');   
-    
-    database.addDeposit(function (err, user) {
-        if (err) {
-            console.log(err)
-        }
-    });
-}, {
-    scheduled: false
-})
-task.start();
 
 
 
