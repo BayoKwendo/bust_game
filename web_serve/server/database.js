@@ -720,7 +720,7 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
         var message = util.format(config.SMS_DEPOSIT, formatDecimals(amount), formatDecimals(mbalance))
         addQueueSMS(config.SENDER_ID, msisdn, message, function (err, user) {
             if (err) return callback(err);
-            addOutgoingSMS(userId, sms_deposit, function (err, user) {
+            addOutgoingSMS(userId, message, function (err, user) {
                 if (err) return callback(err);
                 client.query('INSERT INTO fundings(balance, status,bitcoin_deposit_txid,check_process, user_id, amount, description, channel) VALUES($1,$2,$3,$4, $5, $6, $7, $8)',
                 [mbalance, 'success', transaction_id, 1, userId, amount, description, channel],
