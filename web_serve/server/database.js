@@ -963,7 +963,7 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
                                     if (err) return callback(err);
                                     makeDeposit(client, userId, amount, msisdn, transaction_id, description, channel, function (err) {
                                         if (err) return callback(err);
-                                        updateCustomerLogs(client,customer_id, account_no, name , transaction_id, msisdn, function (err) {   // exciste duty
+                                        updateCustomerLogs(client,customer_id, account_no, name , amount, transaction_id, msisdn, function (err) {   // exciste duty
      
                                             if (tax_amount > 0) {
                                                 updateExciseDuty(client, tax_amount, userId, function (err) {   // exciste duty
