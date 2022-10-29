@@ -697,7 +697,7 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
     
     // console.log(userId)
     client.query("SELECT balance_satoshis, msisdn, referred_income, bonus FROM users WHERE msisdn = $1", // update user wallet
-    [userId], function (err, response) {
+    [msisdn], function (err, response) {
         if (err) return callback(err);
         var mbalance = response.rows[0].balance_satoshis
         var referral = response.rows[0].referred_income
