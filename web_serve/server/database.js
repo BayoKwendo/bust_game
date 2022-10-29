@@ -910,7 +910,6 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
             
             client.query('SELECT * FROM c2b_confirmation limit 1', function (err, result) {
                 
-                console.log(result)
                 if (result.rows[0].count > 0) {
                     
                     var msisdn = result.rows[0].msisdn
@@ -935,6 +934,9 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
                         if (err) return callback(err);
                         if (result.rows[0].count > 0) {
                             // assert(result.rows.length === 1);
+
+                            console.log(result)
+
                             client.query('SELECT id FROM users WHERE msisdn::text = $1', [msisdn], function (err, result) {
                                 
                                 tax_amount = amount_new * (config.EXCISE_DUTY / (1 + config.EXCISE_DUTY))
