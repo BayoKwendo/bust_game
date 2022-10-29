@@ -16,10 +16,10 @@ define([
      */
     _.extend(this, Events);
 
-    // self.ws = io("https://test.bayokwendo.dev/");
+    self.ws = io("https://test.bayokwendo.dev/");
     // self.ws = io(AppConstants.Engine.HOST);
 
-    self.ws = io("http://localhost:3846/");
+    // self.ws = io("http://localhost:3846/");
 
     //Dev functions
     //window.disconnect = function() {
