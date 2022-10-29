@@ -75,11 +75,11 @@ var task = cron.schedule('* * * * * *', () =>  {
     // dd()
     // console.log('console.log');   
     
-    database.addDeposit(function (err, user) {
-        if (err) {
-            console.log(err)
-        }
-    });
+    // database.addDeposit(function (err, user) {
+    //     if (err) {
+    //         console.log(err)
+    //     }
+    // });
 }, {
     scheduled: false
 });
