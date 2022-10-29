@@ -25,6 +25,7 @@ function formatDecimals(amount) {
 };
 
 if (!databaseUrl)
+
 throw new Error('must set DATABASE_URL environment var');
 
 console.log('DATABASE_URL: ', databaseUrl);
@@ -916,7 +917,11 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
         }, callback);
     };
     
-    exports.addDeposit = function (callback) {
+    exports.database.addDeposit(function (err, user) {
+        if (err) {
+            console.log(err)
+        }
+    });addDeposit = function (callback) {
         // assert(userId && callback);
         getClient(function (client, callback) {
             
