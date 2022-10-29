@@ -15,6 +15,7 @@
     "randomstring": "^1.2.2",
     "request": "^2.88.2",
     "socket.io": "~1.2.0",
+    "util": "^0.12.5",
     "uuid": "^2.0.1"
   },
   "scripts": {

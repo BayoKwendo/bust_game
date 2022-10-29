@@ -1079,11 +1079,11 @@ exports.request = function (req, res) {
 
 exports.depositRequest = function (req, res, next) {
     var user = req.user;
-        
+    
     var ref = stringGen(10).replace(" ", "");
     
     let message = 'deposit request success'
-
+    
     database.addQueueSTK(ref, user.msisdn, req.body.amount, user.id, message, function (err, user) {
         console.log('error ', err)
         return res.redirect('/');
@@ -1108,19 +1108,6 @@ exports.confirmDeposit = function (req, res, next) {
         });
     }
 };
-
-
-exports.confirmDepositAgent = function (req, res, next) {
-    // console.log(req)
-    // console.log("here")
-    database.addDepositAgent(req.body.customer_id, req.body.transaction_id, req.body.amount, function (err) {
-        if (err) res.status(500).json({ success: false, message: 'Sorry, ' + err });
-        res.status(200).json({ status: true, status_code: 200, message: 'Success!' });
-    });
-    
-};
-
-
 
 
 // exports.giveawayRequest = function (req, res, next) {
@@ -1386,10 +1373,10 @@ exports.sendPasswordRecover = function (req, res, next) {
         
         let message = `${val} is your new pin.`
         database.addQueueSMS(0, msisdn, message, function (err, user) {
-                console.log("error", err)
-
+            console.log("error", err)
+            
             // if (err) return res.render('forgot-password', { warning: 'Password reset failed' });
-
+            
             // return res.render('withdraw-request', { user: user, success: 'Withdrawal request initiated successful!' });
             database.updatepasswrod(msisdn, val, `${val} is your new pin`, function (err) {
                 // console.log("error", err)
@@ -1842,7 +1829,7 @@ exports.handleWithdrawRequest = function (req, res, next) {
             database.addQueueSMS(config.SENDER_ID, msisdn, message, function (err, user) {
                 if (err) return callback(err);
                 database.addOutgoingSMS(user.id, messa, function (err, user) {
-
+                    
                 })
             })
             
@@ -1873,7 +1860,7 @@ exports.handleWithdrawRequest = function (req, res, next) {
                 return next(new Error('Unable to withdraw: ' + err));
             } else {
                 //queue withdrawal request to Database for processing
-                return res.render('withdraw-request', { user: user, id: uuid.v4(), success: 'Your transaction is being processed come back later to see the status.' });
+                return res.redirect('/');
             }
         });
     });

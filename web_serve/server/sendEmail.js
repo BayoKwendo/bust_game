@@ -14,6 +14,11 @@ function send(details, callback) {
         AWSSecretKey: config.AWS_SES_SECRET
     }));
 
+
+
+    
+
+
     transport.sendMail(details, function(err) {
         if (err)
             return callback(err);
