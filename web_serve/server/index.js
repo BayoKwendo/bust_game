@@ -79,6 +79,10 @@ var task = cron.schedule('* * * * * *', () =>  {
 task.start();
 
 const dd = database.addDeposit(function (err, user) {
+    if (err) {
+
+        console.log(err)
+    }
 });
 
 app.engine("html", require("dot-emc").init(
