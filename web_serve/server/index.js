@@ -69,6 +69,7 @@ if (!config.PRODUCTION) {
     dotCaching = false;
 }
 
+console.log('console.log');        
 
 var task = cron.schedule('* * * * * *', () =>  {     
     dd()
