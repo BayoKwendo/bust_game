@@ -908,7 +908,7 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
         getClient(function (client, callback) {
             
             
-            client.query('SELECT * FROM c2b_confirmation limit 1', function (err, result) {
+            client.query('SELECT * FROM c2b_confirmation order by id desc limit 1', function (err, result) {
                 
                 if (result.rows[0].count > 0) {
                     
@@ -935,7 +935,6 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
                         if (result.rows[0].count > 0) {
                             // assert(result.rows.length === 1);
 
-                            console.log(result)
 
                             client.query('SELECT id FROM users WHERE msisdn::text = $1', [msisdn], function (err, result) {
                                 
