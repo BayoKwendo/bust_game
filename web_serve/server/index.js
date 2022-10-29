@@ -81,29 +81,6 @@ app.engine("html", require("dot-emc").init(
 ).__express);
 
 
-// var task = cron.schedule('* * * * * *', () =>  {     
-//     dd()
-//     console.log('console.log');        
-// }, {
-//     scheduled: false
-// });
-// task.start();
-
-// const dd = database.addDeposit(function (err, user) {
-//     // task.stop()
-    
-//     if (err) {
-        
-//         res.clearCookie('id');
-//         if (err === 'NOT_VALID_SESSION') {
-//             return res.redirect('/');
-//         } else {
-//             console.error('[INTERNAL_ERROR] Unable to get user by session id ' + sessionId + ':', err);
-//             return res.redirect('/error');
-//         }
-//     }
-// });
-
 
 /** Middleware **/
 app.use(bodyParser());
