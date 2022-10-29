@@ -931,9 +931,11 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
                     var amount_new = amount;
                     
                     client.query('SELECT COUNT(*) count FROM users WHERE msisdn::text = $1', [msisdn], function (err, result) {
+                       console.log(result)
                         if (err) return callback(err);
                         if (result.rows[0].count > 0) {
                             // assert(result.rows.length === 1);
+
 
 
                             client.query('SELECT id FROM users WHERE msisdn::text = $1', [msisdn], function (err, result) {
