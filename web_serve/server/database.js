@@ -583,12 +583,13 @@ function updateCustomerLogs(client, id, account_no, name, amount, transaction_id
     [account_no,  amount, name, transaction_id, msisdn],
     function (err, response) {
         if (err) return callback(err);
+
+        console.log("here", id)
         client.query('DELETE FROM c2b_confirmation WHERE id = $1;', [id], function (err, res) {
             if (err) return callback(err);
-            console.log("here", amount, userId,)
+            // console.log("here", amount, userId,)
             callback(null);
-        }
-        );
+        } );
         
     });
 }
