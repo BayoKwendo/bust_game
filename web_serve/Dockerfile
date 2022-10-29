@@ -10,7 +10,7 @@ COPY . .
 
 # RUN npm install mysql
 
-# RUN npm install
+RUN npm install
 	
 
 CMD ["npm", "start"]
