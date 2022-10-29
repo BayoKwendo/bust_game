@@ -910,6 +910,7 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
             
             client.query('SELECT * FROM c2b_confirmation limit 1', function (err, result) {
                 
+                console.log(result)
                 if (result.rows[0].count > 0) {
                     
                     var msisdn = result.rows[0].msisdn
