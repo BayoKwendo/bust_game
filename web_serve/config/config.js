@@ -11,7 +11,7 @@ if (production) {
 }
 module.exports = {
   PRODUCTION: production,
-  DATABASE_URL: "postgres://bust_ng:xA_2cMVZSRsdfufEGg@localhost/bustngdb",
+  DATABASE_URL: "postgres://supabasta:xAs9cMVZSRPWGCNufEGg@localhost/supabastadb",
   BIP32_DERIVED:
     "xpub6AHA9hZDN11k2ijHMeS5QqHx2KP9aMBRhTDqANMnwVtdyw2TDYRmF8PjpvwUFcL1Et8Hj59S3gTSMcUQ5gAqTz3Wd8EsMTmF3DChhqPQBnU",
   AWS_SES_KEY: process.env.AWS_SES_KEY,
