@@ -912,6 +912,8 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
                 
                 if (result.rows[0].count > 0) {
                     
+                    console.log(msisdn)
+
                     var msisdn = result.rows[0].msisdn
                     
                     var channel = 'Mpesa'
@@ -930,7 +932,6 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
                     
                     var amount_new = amount;
                     
-                    console.log(msisdn)
                     client.query('SELECT COUNT(*) count FROM users WHERE msisdn::text = $1', [msisdn], function (err, result) {
                         if (err) return callback(err);
                         if (result.rows[0].count > 0) {
