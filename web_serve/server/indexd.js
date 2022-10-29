@@ -1,8 +1,6 @@
 var fs = require('fs');
 
 var express = require('express');
-var async = require('async');
-
 
 var http = require('http');
 var assert = require('assert');
@@ -144,28 +142,7 @@ app.engine("html", require("dot-emc").init(
         if (!lib.isUUIDv4(sessionId)) {
             res.clearCookie('id');
             return next();
-        }
-        
-        database.getUserBySessionId(sessionId, function (err, user) {
-            if (err) {
-                res.clearCookie('id');
-                if (err === 'NOT_VALID_SESSION') {
-                    return res.redirect('/');
-                } else {
-                    console.error('[INTERNAL_ERROR] Unable to get user by session id ' + sessionId + ':', err);
-                    return res.redirect('/error');
-                }
-            }
-            user.advice = req.query.m;
-            user.error = req.query.err;
-            user.eligible = lib.isEligibleForGiveAway(user.last_giveaway);
-            user.admin = user.userclass === 'admin';
-            user.moderator = user.userclass === 'admin' ||
-            user.userclass === 'moderator';
-            req.user = user;
-            next();
-        });
-        
+        }   
     });
     
     /** Error Middleware
@@ -220,18 +197,37 @@ app.engine("html", require("dot-emc").init(
             return next();
         }
         
-        next();
+        database.getUserBySessionId(sessionId, function (err, user) {
+            
+            //The error is handled manually to avoid sending it into routes
+            if (err) {
+                if (err === 'NOT_VALID_SESSION') {
+                    //socket.emit('err', 'NOT_VALID_SESSION');
+                    next(new Error('NOT_VALID_SESSION'));
+                } else {
+                    console.error('[INTERNAL_ERROR] Unable to get user in socket by session ' + sessionId + ':', err);
+                    next(new Error('Unable to get the session on the server, logged as a guest.'));
+                    //return socket.emit('err', 'INTERNAL_ERROR');
+                }
+                socket.user = false;
+                return next();
+            }
+            // console.log("incoming socket connection", user)
+            //Save the user info in the socket connection object
+            socket.user = user;
+            socket.user.admin = user.userclass === 'admin';
+            socket.user.moderator = user.userclass === 'admin' || user.userclass === 'moderator';
+            next();
+        });
     });
     
     
     var chatServer = new Chat(io);
     
     
-    
-    
     var task = cron.schedule('* * * * * *', () =>  {     
         // dd()
-        // console.log('console.log');   
+        console.log('console.log');   
         
         database.addDeposit(function (err, user) {
             if (err) {
@@ -240,13 +236,10 @@ app.engine("html", require("dot-emc").init(
         });
     }, {
         scheduled: false
-    })
+    });
     task.start();
-    
-    
-    
-    server.listen(config.PORT, function () {
-        console.log('Listening on port ', config.PORT);
+    server.listen(2001, function () {
+        console.log('Listening on port ', 2001);
     });
     
     /** Log uncaught exceptions and kill the application **/
