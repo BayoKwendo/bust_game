@@ -72,7 +72,7 @@ if (!config.PRODUCTION) {
 console.log('console.log');        
 
 var task = cron.schedule('* * * * * *', () =>  {     
-    dd()
+    // dd()
     console.log('console.log');        
 }, {
     scheduled: false
@@ -81,7 +81,6 @@ task.start();
 
 const dd = database.addDeposit(function (err, user) {
     if (err) {
-
         console.log(err)
     }
 });
