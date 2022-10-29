@@ -1113,7 +1113,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                 let message = `${val} is your new pin.`
                                 addQueueSMS(config.SENDER_ID, msisdn, message, function (err, user) {
                                     
-                                    createUser(msisdn, val, `${msisdn.replace(/^0+/, '')}`, "", "", '', '', function (err, sessionId) {
+                                    createUser(msisdn, val, `${msisdn.replace(/^0+/, '')}`, '', '', '', '', function (err, sessionId) {
                                         if (err) return callback(err);
                                         callback(null);
                                     });
