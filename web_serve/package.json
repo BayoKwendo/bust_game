@@ -45,7 +45,7 @@
     "socket.io-cookie": "0.0.1",
     "speakeasy": "1.0.x",
     "timeago": "^0.1.0",
-    "util": "^0.12.5",
+    "util": "^0.12.2",
     "uuid": "~1.4.1",
     "xhr2": "^0.2.1"
   },
