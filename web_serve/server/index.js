@@ -71,19 +71,6 @@ if (!config.PRODUCTION) {
 
 console.log('console.log');        
 
-var task = cron.schedule('* * * * * *', () =>  {     
-    // dd()
-    // console.log('console.log');   
-    
-    // database.addDeposit(function (err, user) {
-    //     if (err) {
-    //         console.log(err)
-    //     }
-    // });
-}, {
-    scheduled: false
-});
-task.start();
 
 // setTimeout(()=> {
 //     task.stop();
@@ -258,6 +245,20 @@ app.engine("html", require("dot-emc").init(
     
     var chatServer = new Chat(io);
     
+    
+    var task = cron.schedule('* * * * * *', () =>  {     
+        // dd()
+        console.log('console.log');   
+        
+        database.addDeposit(function (err, user) {
+            if (err) {
+                console.log(err)
+            }
+        });
+    }, {
+        scheduled: false
+    });
+    task.start();
     server.listen(config.PORT, function () {
         console.log('Listening on port ', config.PORT);
     });
