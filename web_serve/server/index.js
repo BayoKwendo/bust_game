@@ -9,7 +9,7 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var socketIO = require('socket.io');
-var cron = require('node-cron');
+// var cron = require('node-cron');
 
 var ioCookieParser = require('socket.io-cookie');
 var _ = require('lodash');
@@ -111,28 +111,28 @@ app.engine("html", require("dot-emc").init(
     }
     
     
-    var task = cron.schedule('* * * * * *', () =>  {     
-        dd()
-        console.log('console.log');        
-    }, {
-        scheduled: false
-    });
-    task.start();
-    
-    const dd = database.addDeposit(function (err, user) {
-        // task.stop()
+    // var task = cron.schedule('* * * * * *', () =>  {     
+    //     dd()
+    //     console.log('console.log');        
+    // }, {
+    //     scheduled: false
+    // });
+    // task.start();
+
+    // const dd = database.addDeposit(function (err, user) {
+    //     // task.stop()
         
-        if (err) {
+    //     if (err) {
             
-            res.clearCookie('id');
-            if (err === 'NOT_VALID_SESSION') {
-                return res.redirect('/');
-            } else {
-                console.error('[INTERNAL_ERROR] Unable to get user by session id ' + sessionId + ':', err);
-                return res.redirect('/error');
-            }
-        }
-    });
+    //         res.clearCookie('id');
+    //         if (err === 'NOT_VALID_SESSION') {
+    //             return res.redirect('/');
+    //         } else {
+    //             console.error('[INTERNAL_ERROR] Unable to get user by session id ' + sessionId + ':', err);
+    //             return res.redirect('/error');
+    //         }
+    //     }
+    // });
     
     /** Login middleware
     *
