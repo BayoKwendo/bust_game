@@ -639,6 +639,19 @@ exports.addIncomingSMS = function (userId, message, msisdn, callback) {
     });
 };
 
+function addQueueSMS (origin, destination, message, callback) {
+    var sql = 'INSERT INTO sms_queue(originator, destination, message) values($1, $2, $3)';
+    query(sql, [origin, destination, message], function (err, res) {
+        if (err)
+        return callback(err);
+        
+        assert(res.rowCount === 1);
+        
+        callback(null);
+    });
+};
+
+
 
 // sms queue
 exports.addQueueSMS = function (origin, destination, message, callback) {
