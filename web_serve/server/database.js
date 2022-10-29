@@ -196,7 +196,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                                     
                                                     client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
                                                     VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
-                                                    [user.id, '', `Bonus`, 0, config.BONUS, 0, config.BONUS, bonus],
+                                                    [user.id, '', `Bonus`, 0, config.BONUS, 0, config.BONUS, 0],
                                                     
                                                     function (err, response) {
                                                         if (err) return callback(err);
@@ -314,7 +314,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                                         
                                                         client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
                                                         VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
-                                                        [user.id, '', `Bonus`, 0, config.BONUS, 0, config.BONUS, bonus],
+                                                        [user.id, '', `Bonus`, 0, config.BONUS, 0, config.BONUS, 0],
                                                         function (err, response) {
                                                             if (err) return callback(err);
                                                             client.query('UPDATE users SET balance_satoshis = balance_satoshis + $1, bonuses = bonuses + $2 WHERE id = $3', [config.BONUS, config.BONUS, user.id],
