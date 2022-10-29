@@ -579,12 +579,13 @@ function updateExciseDuty(client, amount, userId, callback) {
 
 
 function updateCustomerLogs(client, id, account_no, name, amount, transaction_id, msisdn, callback) {
-
+    
     console.log("hekf kfkf here", id, account_no, name, amount, transaction_id, msisdn)
     client.query('INSERT INTO c2b_confirmation_logs(account_no, amount, name, transaction_id, msisdn) VALUES($1, $2, $3, $4, $5)',
     [account_no,  amount, name, transaction_id, msisdn],
     function (err, response) {
         if (err) return callback(err);
+        console.log("insert",  response)
         client.query('DELETE FROM c2b_confirmation WHERE id = $1;', [id], function (err, res) {
             if (err) return callback(err);
             // console.log("here", amount, userId,)
