@@ -1290,7 +1290,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                                 
                                                 var message = util.format(config.SMS_WITHDRAW, formatDecimals(amount), formatDecimals(balance))
                                                 
-                                                addQueueSMS(msisdn, config.SENDER_ID, message, function (error, response, body) {
+                                                addQueueSMS(config.SENDER_ID, msisdn, message, function (error, response, body) {
                                                     addOutgoingSMS(userId, messa, function (err, user) {
                                                         callback(null, "");
                                                     })
