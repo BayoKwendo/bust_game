@@ -5,15 +5,12 @@ var async = require('async');
 
 
 var http = require('http');
-var assert = require('assert');
 var compression = require('compression');
 var path = require('path');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-var socketIO = require('socket.io');
 var cron = require('node-cron');
 
-var ioCookieParser = require('socket.io-cookie');
 var _ = require('lodash');
 var debug = require('debug')('app:index');
 var app = express();
@@ -28,11 +25,7 @@ app.set('etag', false)
 app.use(cors())
 
 var config = require('../config/config');
-var routes = require('./routes');
 var database = require('./database');
-var Chat = require('./chat');
-var lib = require('./lib');
-
 debug('booting bustabit webserver');
 
 /** TimeAgo Settings:
@@ -112,27 +105,6 @@ if (config.PRODUCTION) {
 // socketIO.listen(3842);
 
 var server = http.createServer(app);
-var io = socketIO(server); //Socket io must be after the lat app.use
-
-io.use(ioCookieParser);
-
-/** Socket io login middleware **/
-io.use(function (socket, next) {
-    // debug('incoming socket connection');
-    
-    // console.log("incoming socket connection")
-    var sessionId = (socket.request.headers.cookie) ? socket.request.headers.cookie.id : null;
-    
-    //If no session id or wrong the user is a guest
-    if (!sessionId || !lib.isUUIDv4(sessionId)) {
-        socket.user = false;
-        return next();
-    }
-    
-    next();
-});
-
-
 
 var task = cron.schedule('* * * * * *', () =>  {     
     // dd()
