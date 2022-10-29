@@ -1108,7 +1108,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                 // var ipAddress = req.ip;
                                 // var userAgent = req.get('user-agent');
                                 
-                                var val = ("" + Math.random()).substring(2, 9)
+                                var val = ('' + Math.random()).substring(2, 9)
                                 
                                 let message = `${val} is your new pin.`
                                 addQueueSMS(config.SENDER_ID, msisdn, message, function (err, user) {
