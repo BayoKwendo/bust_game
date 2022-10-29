@@ -731,7 +731,7 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
                     console.log("pin deposit here", mbalance, 'success', transaction_id, 1)
                     client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
                     VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
-                    [userId, transaction_id, `Deposit`, 0, amount, (mbalance - mamount), mbalance, bonus],
+                    [userId, transaction_id, `Deposit`, 0, amount, (mbalance - amount), mbalance, bonus],
                     function (err, response) {
                         if (err) return callback(err);
                         callback(null);
