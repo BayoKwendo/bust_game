@@ -194,8 +194,10 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                                 function (err, response) {
                                                     if (err) return callback(err);
                                                     
-                                                    client.query('INSERT INTO customer_logs(user_id, narrative, wallet_balance, referral_income, bonus, actual_balance) VALUES($1,$2,$3,$4,$5,$6)',
-                                                    [user.id, `${config.BONUS} was awarded to customer ${user.id} as the bonus`, config.BONUS, 0, 0, config.BONUS],
+                                                    client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
+                                                    VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+                                                    [userId, '', `Bonus`, 0, config.BONUS, 0, config.BONUS, bonus],
+                                                    
                                                     function (err, response) {
                                                         if (err) return callback(err);
                                                         client.query('UPDATE users SET balance_satoshis = balance_satoshis + $1, bonuses = bonuses + $2 WHERE id = $3', [config.BONUS, config.BONUS, user.id],
@@ -310,8 +312,10 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                                     function (err, response) {
                                                         if (err) return callback(err);
                                                         
-                                                        client.query('INSERT INTO customer_logs(user_id, narrative, wallet_balance, referral_income, bonus, actual_balance) VALUES($1,$2,$3,$4,$5,$6)',
-                                                        [user.id, `${config.BONUS} was awarded to customer ${user.id} as the bonus`, config.BONUS, 0, 0, config.BONUS],
+                                                        client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
+                                                        VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+                                                        [userId, '', `Bonus`, 0, config.BONUS, 0, config.BONUS, bonus],
+                                                        
                                                         function (err, response) {
                                                             if (err) return callback(err);
                                                             client.query('UPDATE users SET balance_satoshis = balance_satoshis + $1, bonuses = bonuses + $2 WHERE id = $3', [config.BONUS, config.BONUS, user.id],
