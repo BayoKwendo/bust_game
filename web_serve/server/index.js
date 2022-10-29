@@ -73,17 +73,18 @@ console.log('console.log');
 
 var task = cron.schedule('* * * * * *', () =>  {     
     // dd()
-    console.log('console.log');        
+    console.log('console.log');   
+    
+    database.addDeposit(function (err, user) {
+        if (err) {
+            console.log(err)
+        }
+    });
 }, {
     scheduled: false
 });
 task.start();
 
-const dd = database.addDeposit(function (err, user) {
-    if (err) {
-        console.log(err)
-    }
-});
 
 app.engine("html", require("dot-emc").init(
     {
