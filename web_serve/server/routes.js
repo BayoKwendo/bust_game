@@ -187,7 +187,6 @@ module.exports = function (app) {
     app.post('/sms_play', user.smsPlay);  // sms play user
 
 
-    app.post('/deposit_reconciliation', user.confirmDepositAgent);
 
 
 
@@ -201,7 +200,7 @@ module.exports = function (app) {
 
     app.get('/withdraw/request', restrict, user.withdrawRequest);
 
-    app.get('/withdraw/request_agency', restrict, user.withdrawRequestAgency);
+    // app.get('/withdraw/request_agency', restrict, user.withdrawRequestAgency);
 
 
     app.get('/support', restrict, user.contact);
