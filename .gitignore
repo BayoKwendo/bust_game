@@ -6,8 +6,8 @@
 # Node artifact files
 web_serve/node_modules/
 game_server/node_modules/
-web_serve/node_modules.zip
-game_server/node_modules.zip
+# web_serve/node_modules.zip
+# game_server/node_modules.zip
 web_serve/client_new/vendor/
 
 dist/

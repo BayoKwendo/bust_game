@@ -7,6 +7,7 @@ var pg = require('pg');
 var config = require('./config');
 var util = require('util');
 
+
 if (!config.DATABASE_URL)
 throw new Error('must set DATABASE_URL environment var');
 
