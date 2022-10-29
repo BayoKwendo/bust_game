@@ -16,5 +16,13 @@ services:
       context: ./web_serve
       dockerfile: Dockerfile
     container_name: web_service_v2
+
+  deposits:
+    restart: always
+    network_mode: host
+    build:
+      context: ./deposits
+      dockerfile: Dockerfile
+    container_name: deposit
   
  
