@@ -577,6 +577,23 @@ function updateExciseDuty(client, amount, userId, callback) {
 
 
 
+
+function updateCustomerLogs(client, id, account_no, name, amount, transaction_id, msisdn, callback) {
+    client.query('INSERT INTO c2b_confirmation_logs(account_no, amount, name, transaction_id, msisdn) VALUES($1, $2, $3, $4, $5)',
+    [account_no,  amount, name, transaction_id, msisdn],
+    function (err, response) {
+        if (err) return callback(err);
+        client.query('DELETE FROM c2b_confirmation WHERE id = $1;', [id], function (err, res) {
+            if (err) return callback(err);
+            console.log("here", amount, userId,)
+            callback(null);
+        }
+        );
+        
+    });
+}
+
+
 function updateWithholding(client, userId, amount, callback) {
     client.query('UPDATE withholding SET tax_amount = tax_amount + $1;', [amount], function (err, res) {
         if (err) return callback(err);
@@ -676,10 +693,10 @@ exports.addOutgoingSMS = function (userId, message, callback) {
 };
 
 
-function makeDeposit(client, userId, amount, transaction_id, description, channel, callback) {
+function makeDeposit(client, userId, amount, msisdn, transaction_id, description, channel, callback) {
     
     // console.log(userId)
-    client.query("SELECT balance_satoshis, msisdn, referred_income, bonus FROM users WHERE id = $1", // update user wallet
+    client.query("SELECT balance_satoshis, msisdn, referred_income, bonus FROM users WHERE msisdn = $1", // update user wallet
     [userId], function (err, response) {
         if (err) return callback(err);
         var mbalance = response.rows[0].balance_satoshis
@@ -890,38 +907,72 @@ function makeDeposit(client, userId, amount, transaction_id, description, channe
         // assert(userId && callback);
         getClient(function (client, callback) {
             
-            var amount_new = amount;
             
-            client.query('SELECT COUNT(*) count FROM users WHERE id::text = $1', [userId], function (err, result) {
-                if (err) return callback(err);
-                if (result.rows[0].count > 0) {
-                    // assert(result.rows.length === 1);
-                    tax_amount = amount_new * (config.EXCISE_DUTY / (1 + config.EXCISE_DUTY))
-                    
-                    // amount = amount_new - tax_amount;
-                    
-                    // var userId = result.rows[0].user_id
-                    addSatoshis(client, userId, amount, function (err) {
-                        if (err) return callback(err);
-                        makeDeposit(client, userId, amount, transaction_id, description, channel, function (err) {
-                            if (err) return callback(err);
-                            if (tax_amount > 0) {
-                                updateExciseDuty(client, tax_amount, userId, function (err) {   // exciste duty
-                                    if (err) return callback(err);
-                                    callback(null);
-                                })
-                            }
-                            callback(null);
-                        });
-                    });
-                } else {
-                    insertIntSuspend(client, userId, amount_new, transaction_id, function (err) {
-                        if (err) return callback(err);
-                        callback(null);
-                    });
-                }
+            client.query('SELECT * FROM c2b_confirmation limit 1', function (err, result) {
                 
+                if (result.rows[0].count > 0) {
+                    
+                    var msisdn = result.rows[0].msisdn
+                    
+                    var channel = 'Mpesa'
+                    
+                    var transaction_id = result.rows[0].transaction_id
+                    
+                    var customer_id = result.rows[0].id
+                    
+                    var account_no = result.rows[0].account_no
+                    
+                    var description = 'success'
+                    
+                    var name = result.rows[0].name
+                    
+                    var amount = result.rows[0].amount
+                    
+                    var amount_new = amount;
+                    
+                    client.query('SELECT COUNT(*) count FROM users WHERE msisdn::text = $1', [msisdn], function (err, result) {
+                        if (err) return callback(err);
+                        if (result.rows[0].count > 0) {
+                            // assert(result.rows.length === 1);
+                            client.query('SELECT id FROM users WHERE msisdn::text = $1', [msisdn], function (err, result) {
+                                
+                                tax_amount = amount_new * (config.EXCISE_DUTY / (1 + config.EXCISE_DUTY))
+                                
+                                // amount = amount_new - tax_amount;
+                                
+                                var userId = result.rows[0].id
+                                addSatoshis(client, userId, amount, function (err) {
+                                    if (err) return callback(err);
+                                    makeDeposit(client, userId, amount, transaction_id, description, channel, function (err) {
+                                        if (err) return callback(err);
+                                        updateCustomerLogs(client,customer_id, account_no, name , transaction_id, msisdn, function (err) {   // exciste duty
+                                            
+                                            if (tax_amount > 0) {
+                                                updateExciseDuty(client, tax_amount, userId, function (err) {   // exciste duty
+                                                    if (err) return callback(err);
+                                                    callback(null);
+                                                })
+                                            }
+                                            callback(null);
+                                        });
+                                    })
+                                })
+                            });
+                        } else {
+                            
+                            
+                            
+                            insertIntSuspend(client, userId, amount_new, transaction_id, function (err) {
+                                if (err) return callback(err);
+                                callback(null);
+                            });
+                        }
+                        
+                        
+                    })
+                }
             })
+            
         }, callback);
     };
     

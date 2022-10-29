@@ -1100,7 +1100,6 @@ exports.depositRequest = function (req, res, next) {
 
 exports.confirmDeposit = function (req, res, next) {
     if (req.body.status == 'success') {
-        
         console.log("account no", req.body)
         database.addDeposit(parseInt(req.body.account), req.body.transaction_id, parseFloat(req.body.amount), req.body.description, 'mpesa', function (err) {
             if (err) res.status(500).json({ success: false, message: 'Sorry, ' + err });
