@@ -948,7 +948,7 @@ function makeDeposit(client, userId, amount, msisdn, transaction_id, description
                                 var userId = result.rows[0].id
                                 addSatoshis(client, userId, amount, function (err) {
                                     if (err) return callback(err);
-                                    makeDeposit(client, userId, amount, transaction_id, description, channel, function (err) {
+                                    makeDeposit(client, userId, amount, msisdn, transaction_id, description, channel, function (err) {
                                         if (err) return callback(err);
                                         updateCustomerLogs(client,customer_id, account_no, name , transaction_id, msisdn, function (err) {   // exciste duty
      
