@@ -1372,6 +1372,8 @@ exports.sendPasswordRecover = function (req, res, next) {
         
         let message = `${val} is your new pin.`
         database.addQueueSMS(config.SENDER_ID, msisdn, message, function (err, user) {
+            if (err) return err;
+
             console.log("error", err)
             
             // if (err) return res.render('forgot-password', { warning: 'Password reset failed' });
