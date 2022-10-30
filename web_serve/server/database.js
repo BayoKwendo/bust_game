@@ -752,6 +752,8 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
     
     
     exports.addIncomingSMS = function (userId, message, msisdn, callback) {
+
+        console.log(userId, message, msisdn)
         var sql = 'INSERT INTO incoming_sms (user_id, narrative, msisdn) values($1, $2, $3)';
         query(sql, [userId, message, msisdn], function (err, res) {
             if (err)
