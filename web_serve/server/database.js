@@ -1266,7 +1266,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                         if (err) return callback(err);
                                         
                                         
-                                        client.query("SELECT balance_satoshis,referred_income,bonus FROM users WHERE id = $1", // update user wallet
+                                        client.query("SELECT balance_satoshis,referred_income,bonus, msisdn FROM users WHERE id = $1", // update user wallet
                                         [userId], function (err, response) {
                                             if (err) return callback(err);
                                             var balance = response.rows[0].balance_satoshis
