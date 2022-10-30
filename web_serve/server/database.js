@@ -1232,7 +1232,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
             
             
             
-            exports.requestWithdrawal = function (userId, amount, withdrawl_charges, withdrawalAddress, withdrawalId, mpesa_charges, callback) {
+            exports.requestWithdrawal = function (client, userId, amount, withdrawl_charges, withdrawalAddress, withdrawalId, mpesa_charges, callback) {
                 assert(typeof userId === 'number');
                 assert(typeof amount === 'number');
                 
