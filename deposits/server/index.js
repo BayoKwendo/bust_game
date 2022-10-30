@@ -65,19 +65,12 @@ app.enable('trust proxy');
 /** Serve Static content **/
 var twoWeeksInSeconds = 1209600;
 
-let d = true
-
-
-function loop(){
-    database.addDeposit(function (err, user) {
-        if (err) {
-            console.log(err)
-        }
-        loop()
+const loop = async () => {
+    await database.addDeposit( async (err, user) => {
+        if (err) {console.log(err)}
+        await loop()
     });
 }
-
-loop()
 // while (d) {
 //     console.log(d)
 //     d = false
@@ -105,8 +98,11 @@ var server = http.createServer(app);
 
 
 
-server.listen(2001, function () {
+server.listen(2001, async function () {
     console.log('Listening on port ', 2001);
+
+    await loop()
+
 });
 
 /** Log uncaught exceptions and kill the application **/

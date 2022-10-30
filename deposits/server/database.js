@@ -346,7 +346,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
         }
         
     
-        exports.addDeposit = function (callback) {
+        exports.addDeposit = async function(callback) {
             // assert(userId && callback);
             getClient(function (client, callback) {
                 
