@@ -1232,324 +1232,328 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
             
             
             
-            exports.requestWithdrawal = function (client, userId, amount, withdrawl_charges, withdrawalAddress, withdrawalId, mpesa_charges, callback) {
+            exports.requestWithdrawal = function (userId, amount, withdrawl_charges, withdrawalAddress, withdrawalId, mpesa_charges, callback) {
                 assert(typeof userId === 'number');
                 assert(typeof amount === 'number');
                 
                 
                 // assert(typeof withdrawalAddress === 'string');
                 // assert(satoshis > 200000);]
-                
-                client.query("UPDATE users SET balance_satoshis = balance_satoshis - $1,  total_withdrawal = total_withdrawal + $2 WHERE id = $3", // update user wallet
-                [(amount + mpesa_charges), (amount + mpesa_charges), userId], function (err, response) {
-                    if (err) return callback(err);
-                    //
-                    
-                    client.query("SELECT balance_satoshis, msisdn FROM users WHERE id = $1", // update user wallet
-                    [userId], function (err, response) {
-                        if (err) return callback(err);
-                        var balance = response.rows[0].balance_satoshis
-                        client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
-                        VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
-                        [userId, ``, `Withdraw`, (amount + mpesa_charges), 0, (balance + amount + mpesa_charges),
-                        balance, 0],
-                        function (err, response) {
-                            
+                getClient(
+                    function (client, callback) {
+                        
+                        client.query("UPDATE users SET balance_satoshis = balance_satoshis - $1,  total_withdrawal = total_withdrawal + $2 WHERE id = $3", // update user wallet
+                        [(amount + mpesa_charges), (amount + mpesa_charges), userId], function (err, response) {
                             if (err) return callback(err);
+                            //
                             
-                            client.query('INSERT INTO fundings(user_id, amount, bitcoin_withdrawal_address,  balance, description,global_withdrawal_id, status, check_process) ' +   //record withdraw requests
-                            "VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-                            [userId, -1 * (amount + mpesa_charges), withdrawalAddress, balance, 'Withdrawal', withdrawalId, "success", 1],
-                            function (err, response) {
+                            client.query("SELECT balance_satoshis, msisdn FROM users WHERE id = $1", // update user wallet
+                            [userId], function (err, response) {
                                 if (err) return callback(err);
-                                
-                                
-                                client.query("SELECT balance_satoshis,referred_income,bonus FROM users WHERE id = $1", // update user wallet
-                                [userId], function (err, response) {
-                                    if (err) return callback(err);
-                                    var balance = response.rows[0].balance_satoshis
-                                    var mbalance = response.rows[0].balance_satoshis
-                                    var referral = response.rows[0].referred_income
-                                    var msisdn = response.rows[0].msisdn
-                                    var bonus = response.rows[0].bonus
+                                var balance = response.rows[0].balance_satoshis
+                                client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
+                                VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+                                [userId, ``, `Withdraw`, (amount + mpesa_charges), 0, (balance + amount + mpesa_charges),
+                                balance, 0],
+                                function (err, response) {
                                     
-                                    client.query('INSERT INTO mpesa_disburse(msisdn, amount) ' +   //record withdraw requests
-                                    "VALUES($1, $2)", [msisdn, amount],
+                                    if (err) return callback(err);
+                                    
+                                    client.query('INSERT INTO fundings(user_id, amount, bitcoin_withdrawal_address,  balance, description,global_withdrawal_id, status, check_process) ' +   //record withdraw requests
+                                    "VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
+                                    [userId, -1 * (amount + mpesa_charges), withdrawalAddress, balance, 'Withdrawal', withdrawalId, "success", 1],
                                     function (err, response) {
                                         if (err) return callback(err);
                                         
-                                        console.log(response)
-                                        var message = util.format(config.SMS_WITHDRAW, formatDecimals(amount), formatDecimals(balance))
                                         
-                                        addQueueSMS(config.SENDER_ID, msisdn, message, function (error, response, body) {
-                                            addOutgoingSMS(userId, message, function (err, user) {
-                                                callback(null, "");
+                                        client.query("SELECT balance_satoshis,referred_income,bonus FROM users WHERE id = $1", // update user wallet
+                                        [userId], function (err, response) {
+                                            if (err) return callback(err);
+                                            var balance = response.rows[0].balance_satoshis
+                                            var mbalance = response.rows[0].balance_satoshis
+                                            var referral = response.rows[0].referred_income
+                                            var msisdn = response.rows[0].msisdn
+                                            var bonus = response.rows[0].bonus
+                                            
+                                            client.query('INSERT INTO mpesa_disburse(msisdn, amount) ' +   //record withdraw requests
+                                            "VALUES($1, $2)", [msisdn, amount],
+                                            function (err, response) {
+                                                if (err) return callback(err);
+                                                
+                                                console.log(response)
+                                                var message = util.format(config.SMS_WITHDRAW, formatDecimals(amount), formatDecimals(balance))
+                                                
+                                                addQueueSMS(config.SENDER_ID, msisdn, message, function (error, response, body) {
+                                                    addOutgoingSMS(userId, message, function (err, user) {
+                                                        callback(null, "");
+                                                    })
+                                                })
                                             })
                                         })
+                                        
                                     })
                                 })
-                                
                             })
                         })
-                    })
+                        
+                    }, callback);
                     
-                }, callback);
-            };
-            
-            
-            
-            /*
-            exports.makeWithdrawal = function (reference, transaction_id, callback) {
-                getClient(function (client, callback) {
-                    console.log("here", reference, transaction_id)
-                    // SELECT * FROM fundings WHERE user_id = $1
-                    client.query('SELECT user_id, amount from fundings WHERE withdrawal_id = $1',
-                    [reference],
-                    function (err, response) {
-                        if (err) return callback(err);
-                        var user_id = response.rows[0].user_id
-                        
-                        var amount = response.rows[0].amount * -1
-                        
-                        client.query('UPDATE fundings SET status = $1 , check_process = $1 where global_withdrawal_id = $2',
-                        ['success', reference],
+                };
+                
+                
+                
+                /*
+                exports.makeWithdrawal = function (reference, transaction_id, callback) {
+                    getClient(function (client, callback) {
+                        console.log("here", reference, transaction_id)
+                        // SELECT * FROM fundings WHERE user_id = $1
+                        client.query('SELECT user_id, amount from fundings WHERE withdrawal_id = $1',
+                        [reference],
                         function (err, response) {
                             if (err) return callback(err);
-                            client.query('SELECT * from users where id = $1',
-                            [user_id],
+                            var user_id = response.rows[0].user_id
+                            
+                            var amount = response.rows[0].amount * -1
+                            
+                            client.query('UPDATE fundings SET status = $1 , check_process = $1 where global_withdrawal_id = $2',
+                            ['success', reference],
                             function (err, response) {
                                 if (err) return callback(err);
-                                var mbalance = response.rows[0].balance_satoshis
-                                var referral = response.rows[0].referred_income
-                                var bonus = response.rows[0].bonus
-                                
-                                client.query('INSERT INTO customer_logs(user_id, narrative, wallet_balance, referral_income, bonus, actual_balance) VALUES($1,$2,$3,$4,$5,$6)',
-                                [user_id, `${amount} was withdrawed. Reference ID ${reference}`, mbalance, referral, bonus, (mbalance + referral + bonus)],
+                                client.query('SELECT * from users where id = $1',
+                                [user_id],
                                 function (err, response) {
                                     if (err) return callback(err);
-                                    callback(null);
+                                    var mbalance = response.rows[0].balance_satoshis
+                                    var referral = response.rows[0].referred_income
+                                    var bonus = response.rows[0].bonus
+                                    
+                                    client.query('INSERT INTO customer_logs(user_id, narrative, wallet_balance, referral_income, bonus, actual_balance) VALUES($1,$2,$3,$4,$5,$6)',
+                                    [user_id, `${amount} was withdrawed. Reference ID ${reference}`, mbalance, referral, bonus, (mbalance + referral + bonus)],
+                                    function (err, response) {
+                                        if (err) return callback(err);
+                                        callback(null);
+                                    })
                                 })
                             })
                         })
-                    })
-                }, callback);
-            };
-            */
-            
-            exports.getWithdrawals = function (userId, callback) {
-                assert(userId && callback);
+                    }, callback);
+                };
+                */
                 
-                query("SELECT * FROM fundings WHERE user_id = $1 AND amount < 0 ORDER BY created DESC", [userId], function (err, result) {
-                    if (err) return callback(err);
+                exports.getWithdrawals = function (userId, callback) {
+                    assert(userId && callback);
                     
-                    var data = result.rows.map(function (row) {
-                        return {
-                            amount: Math.abs(row.amount),
-                            destination: row.bitcoin_withdrawal_address,
-                            status: row.status,
-                            description: row.description,
-                            created: row.created
-                        };
-                    });
-                    callback(null, data);
-                });
-            };
-            
-            
-            exports.verify_user = function (msisdn, betAmount, callback) {
-                
-                query("SELECT * FROM users WHERE msisdn = $1;", [msisdn], function (err, result) {
-                    if (err) return callback(err);
-                    
-                    if (result.rows.length > 0) {
+                    query("SELECT * FROM fundings WHERE user_id = $1 AND amount < 0 ORDER BY created DESC", [userId], function (err, result) {
+                        if (err) return callback(err);
                         
                         var data = result.rows.map(function (row) {
                             return {
-                                id: row.id,
-                                username: row.username,
-                                balance: row.balance_satoshis - betAmount,
-                                mbalance: row.balance_satoshis,
-                                msisdn: row.msisdn,
-                                playing: row.playing,
-                                name: row.name
+                                amount: Math.abs(row.amount),
+                                destination: row.bitcoin_withdrawal_address,
+                                status: row.status,
+                                description: row.description,
+                                created: row.created
                             };
                         });
-                        callback(null, data[0]);
-                    } else {
-                        callback(null, 0)
-                    }
-                });
-            };
-            
-            
-            
-            exports.getReferrals = function (userId, callback) {
-                assert(userId && callback);
-                
-                query("SELECT * FROM users WHERE id = $1", [userId], function (err, result) {
-                    if (err) return callback(err);
-                    var data = result.rows[0]
-                    console.log(data)
-                    callback(null, data);
-                });
-            };
-            
-            exports.getDeposits = function (userId, callback) {
-                assert(userId && callback);
-                
-                query("SELECT * FROM fundings WHERE user_id = $1 AND amount > 0 ORDER BY created DESC", [userId], function (err, result) {
-                    if (err) return callback(err);
-                    
-                    var data = result.rows.map(function (row) {
-                        return {
-                            amount: row.amount,
-                            txid: row.bitcoin_deposit_txid,
-                            created: row.created
-                        };
+                        callback(null, data);
                     });
-                    callback(null, data);
-                });
-            };
-            
-            exports.getDepositsAmount = function (userId, callback) {
-                assert(userId);
-                query('SELECT SUM(f.amount) FROM fundings f WHERE user_id = $1 AND amount >= 0', [userId], function (err, result) {
-                    if (err) return callback(err);
-                    callback(null, result.rows[0]);
-                });
-            };
-            
-            exports.getWithdrawalsAmount = function (userId, callback) {
-                assert(userId);
-                query('SELECT SUM(f.amount) FROM fundings f WHERE user_id = $1 AND amount < 0', [userId], function (err, result) {
-                    if (err) return callback(err);
+                };
+                
+                
+                exports.verify_user = function (msisdn, betAmount, callback) {
                     
-                    callback(null, result.rows[0]);
-                });
-            };
-            
-            exports.setFundingsWithdrawalTxid = function (fundingId, txid, callback) {
-                // assert(typeof fundingId === 'number');
-                // assert(typeof txid === 'string');
-                // assert(callback);
-                query(`SELECT count(*) FROM fundings WHERE bitcoin_withdrawal_txid <> '' AND withdrawal_id = $1`, [txid],
-                function (err, data) {
-                    if (err) return callback(err);
-                    assert(data.rows.length === 1);
-                    if (data.rows[0].count > 0)
-                    return callback('Transaction already verified');
-                    
-                    query('UPDATE fundings SET bitcoin_withdrawal_txid = $1 WHERE withdrawal_id = $2', [fundingId, txid],
-                    function (err, result) {
+                    query("SELECT * FROM users WHERE msisdn = $1;", [msisdn], function (err, result) {
                         if (err) return callback(err);
-                        // assert(result.rowCount === 1);
-                        callback(null);
+                        
+                        if (result.rows.length > 0) {
+                            
+                            var data = result.rows.map(function (row) {
+                                return {
+                                    id: row.id,
+                                    username: row.username,
+                                    balance: row.balance_satoshis - betAmount,
+                                    mbalance: row.balance_satoshis,
+                                    msisdn: row.msisdn,
+                                    playing: row.playing,
+                                    name: row.name
+                                };
+                            });
+                            callback(null, data[0]);
+                        } else {
+                            callback(null, 0)
+                        }
+                    });
+                };
+                
+                
+                
+                exports.getReferrals = function (userId, callback) {
+                    assert(userId && callback);
+                    
+                    query("SELECT * FROM users WHERE id = $1", [userId], function (err, result) {
+                        if (err) return callback(err);
+                        var data = result.rows[0]
+                        console.log(data)
+                        callback(null, data);
+                    });
+                };
+                
+                exports.getDeposits = function (userId, callback) {
+                    assert(userId && callback);
+                    
+                    query("SELECT * FROM fundings WHERE user_id = $1 AND amount > 0 ORDER BY created DESC", [userId], function (err, result) {
+                        if (err) return callback(err);
+                        
+                        var data = result.rows.map(function (row) {
+                            return {
+                                amount: row.amount,
+                                txid: row.bitcoin_deposit_txid,
+                                created: row.created
+                            };
+                        });
+                        callback(null, data);
+                    });
+                };
+                
+                exports.getDepositsAmount = function (userId, callback) {
+                    assert(userId);
+                    query('SELECT SUM(f.amount) FROM fundings f WHERE user_id = $1 AND amount >= 0', [userId], function (err, result) {
+                        if (err) return callback(err);
+                        callback(null, result.rows[0]);
+                    });
+                };
+                
+                exports.getWithdrawalsAmount = function (userId, callback) {
+                    assert(userId);
+                    query('SELECT SUM(f.amount) FROM fundings f WHERE user_id = $1 AND amount < 0', [userId], function (err, result) {
+                        if (err) return callback(err);
+                        
+                        callback(null, result.rows[0]);
+                    });
+                };
+                
+                exports.setFundingsWithdrawalTxid = function (fundingId, txid, callback) {
+                    // assert(typeof fundingId === 'number');
+                    // assert(typeof txid === 'string');
+                    // assert(callback);
+                    query(`SELECT count(*) FROM fundings WHERE bitcoin_withdrawal_txid <> '' AND withdrawal_id = $1`, [txid],
+                    function (err, data) {
+                        if (err) return callback(err);
+                        assert(data.rows.length === 1);
+                        if (data.rows[0].count > 0)
+                        return callback('Transaction already verified');
+                        
+                        query('UPDATE fundings SET bitcoin_withdrawal_txid = $1 WHERE withdrawal_id = $2', [fundingId, txid],
+                        function (err, result) {
+                            if (err) return callback(err);
+                            // assert(result.rowCount === 1);
+                            callback(null);
+                        }
+                        );
+                        
                     }
                     );
                     
-                }
-                );
+                };
                 
-            };
-            
-            
-            exports.getLeaderBoard = function (byDb, order, callback) {
-                var sql = 'SELECT * FROM leaderboard ORDER BY ' + byDb + ' ' + order + ' LIMIT 100';
-                query(sql, function (err, data) {
+                
+                exports.getLeaderBoard = function (byDb, order, callback) {
+                    var sql = 'SELECT * FROM leaderboard ORDER BY ' + byDb + ' ' + order + ' LIMIT 100';
+                    query(sql, function (err, data) {
+                        if (err)
+                        return callback(err);
+                        callback(null, data.rows);
+                    });
+                };
+                
+                exports.addChatMessage = function (userId, created, message, channelName, isBot, callback) {
+                    var sql = 'INSERT INTO chat_messages (user_id, created, message, channel, is_bot) values($1, $2, $3, $4, $5)';
+                    query(sql, [userId, created, message, channelName, isBot], function (err, res) {
+                        if (err)
+                        return callback(err);
+                        
+                        assert(res.rowCount === 1);
+                        
+                        callback(null);
+                    });
+                };
+                
+                exports.getChatTable = function (limit, channelName, callback) {
+                    assert(typeof limit === 'number');
+                    var sql = "SELECT chat_messages.created AS date, 'say' AS type, users.username, users.userclass AS role, chat_messages.message, is_bot AS bot " +
+                    "FROM chat_messages JOIN users ON users.id = chat_messages.user_id WHERE channel = $1 ORDER BY chat_messages.id DESC LIMIT $2";
+                    query(sql, [channelName, limit], function (err, data) {
+                        if (err)
+                        return callback(err);
+                        callback(null, data.rows);
+                    });
+                };
+                
+                //Get the history of the chat of all channels except the mods channel
+                exports.getAllChatTable = function (limit, callback) {
+                    assert(typeof limit === 'number');
+                    var sql = m(function () {/*
+                    SELECT chat_messages.created AS date, 'say' AS type, users.username, users.userclass AS role, chat_messages.message, is_bot AS bot, chat_messages.channel AS "channelName"
+                    FROM chat_messages JOIN users ON users.id = chat_messages.user_id WHERE channel <> 'moderators'  ORDER BY chat_messages.id DESC LIMIT $1
+                */});
+                query(sql, [limit], function (err, data) {
                     if (err)
                     return callback(err);
                     callback(null, data.rows);
                 });
             };
             
-            exports.addChatMessage = function (userId, created, message, channelName, isBot, callback) {
-                var sql = 'INSERT INTO chat_messages (user_id, created, message, channel, is_bot) values($1, $2, $3, $4, $5)';
-                query(sql, [userId, created, message, channelName, isBot], function (err, res) {
-                    if (err)
-                    return callback(err);
-                    
-                    assert(res.rowCount === 1);
-                    
-                    callback(null);
-                });
-            };
-            
-            exports.getChatTable = function (limit, channelName, callback) {
-                assert(typeof limit === 'number');
-                var sql = "SELECT chat_messages.created AS date, 'say' AS type, users.username, users.userclass AS role, chat_messages.message, is_bot AS bot " +
-                "FROM chat_messages JOIN users ON users.id = chat_messages.user_id WHERE channel = $1 ORDER BY chat_messages.id DESC LIMIT $2";
-                query(sql, [channelName, limit], function (err, data) {
-                    if (err)
-                    return callback(err);
-                    callback(null, data.rows);
-                });
-            };
-            
-            //Get the history of the chat of all channels except the mods channel
-            exports.getAllChatTable = function (limit, callback) {
-                assert(typeof limit === 'number');
-                var sql = m(function () {/*
-                SELECT chat_messages.created AS date, 'say' AS type, users.username, users.userclass AS role, chat_messages.message, is_bot AS bot, chat_messages.channel AS "channelName"
-                FROM chat_messages JOIN users ON users.id = chat_messages.user_id WHERE channel <> 'moderators'  ORDER BY chat_messages.id DESC LIMIT $1
-            */});
-            query(sql, [limit], function (err, data) {
-                if (err)
-                return callback(err);
-                callback(null, data.rows);
-            });
-        };
-        
-        exports.getSiteStats = function (callback) {
-            
-            function as(name, callback) {
-                return function (err, results) {
-                    if (err)
-                    return callback(err);
-                    
-                    assert(results.rows.length === 1);
-                    callback(null, [name, results.rows[0]]);
+            exports.getSiteStats = function (callback) {
+                
+                function as(name, callback) {
+                    return function (err, results) {
+                        if (err)
+                        return callback(err);
+                        
+                        assert(results.rows.length === 1);
+                        callback(null, [name, results.rows[0]]);
+                    }
                 }
-            }
-            
-            var tasks = [
-                function (callback) {
-                    query('SELECT COUNT(*) FROM users', as('users', callback));
-                },
-                function (callback) {
-                    query('SELECT COUNT(*) FROM games', as('games', callback));
-                },
-                function (callback) {
-                    query('SELECT COALESCE(SUM(fundings.amount), 0)::bigint sum FROM fundings WHERE amount < 0', as('withdrawals', callback));
-                },
-                function (callback) {
-                    query("SELECT COUNT(*) FROM games WHERE ended = false AND created < NOW() - interval '5 minutes'", as('unterminated_games', callback));
-                },
-                function (callback) {
-                    query('SELECT COUNT(*) FROM fundings WHERE amount < 0 AND bitcoin_withdrawal_txid IS NULL', as('pending_withdrawals', callback));
-                },
-                function (callback) {
-                    query('SELECT COALESCE(SUM(fundings.amount), 0)::bigint sum FROM fundings WHERE amount > 0', as('deposits', callback));
-                },
-                function (callback) {
-                    query('SELECT ' +
-                    'COUNT(*) count, ' +
-                    'SUM(plays.bet)::bigint total_bet, ' +
-                    'SUM(plays.cash_out)::bigint cashed_out, ' +
-                    'SUM(plays.bonus)::bigint bonused ' +
-                    'FROM plays', as('plays', callback));
-                }
-            ];
-            
-            async.series(tasks, function (err, results) {
-                if (err) return callback(err);
                 
-                var data = {};
+                var tasks = [
+                    function (callback) {
+                        query('SELECT COUNT(*) FROM users', as('users', callback));
+                    },
+                    function (callback) {
+                        query('SELECT COUNT(*) FROM games', as('games', callback));
+                    },
+                    function (callback) {
+                        query('SELECT COALESCE(SUM(fundings.amount), 0)::bigint sum FROM fundings WHERE amount < 0', as('withdrawals', callback));
+                    },
+                    function (callback) {
+                        query("SELECT COUNT(*) FROM games WHERE ended = false AND created < NOW() - interval '5 minutes'", as('unterminated_games', callback));
+                    },
+                    function (callback) {
+                        query('SELECT COUNT(*) FROM fundings WHERE amount < 0 AND bitcoin_withdrawal_txid IS NULL', as('pending_withdrawals', callback));
+                    },
+                    function (callback) {
+                        query('SELECT COALESCE(SUM(fundings.amount), 0)::bigint sum FROM fundings WHERE amount > 0', as('deposits', callback));
+                    },
+                    function (callback) {
+                        query('SELECT ' +
+                        'COUNT(*) count, ' +
+                        'SUM(plays.bet)::bigint total_bet, ' +
+                        'SUM(plays.cash_out)::bigint cashed_out, ' +
+                        'SUM(plays.bonus)::bigint bonused ' +
+                        'FROM plays', as('plays', callback));
+                    }
+                ];
                 
-                results.forEach(function (entry) {
-                    data[entry[0]] = entry[1];
+                async.series(tasks, function (err, results) {
+                    if (err) return callback(err);
+                    
+                    var data = {};
+                    
+                    results.forEach(function (entry) {
+                        data[entry[0]] = entry[1];
+                    });
+                    
+                    callback(null, data);
                 });
                 
-                callback(null, data);
-            });
-            
-        };
+            };
