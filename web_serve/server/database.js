@@ -753,8 +753,10 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
     
     exports.addIncomingSMS = function (userId, message, msisdn, callback) {
 
-        console.log(userId, message, msisdn)
         var sql = 'INSERT INTO incoming_sms (user_id, narrative, msisdn) values($1, $2, $3)';
+
+        console.log(userId, message, msisdn)
+
         query(sql, [userId, message, msisdn], function (err, res) {
             if (err)
             return callback(err);
@@ -766,6 +768,8 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
     };
     
     function addQueueSMS (origin, destination, message, callback) {
+        console.log(origin, destination, message)
+
         var sql = 'INSERT INTO sms_queue(originator, destination, message) values($1, $2, $3)';
         query(sql, [origin, destination, message], function (err, res) {
             if (err)
