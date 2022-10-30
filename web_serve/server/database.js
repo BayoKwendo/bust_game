@@ -1289,7 +1289,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                             var msisdn = response.rows[0].msisdn
                                             var bonus = response.rows[0].bonus
                                             
-                                            client.query('INSERT INTO mpesa_disburse(msisdn, amount) ' +   //record withdraw requests
+                                            client.query('INSERT INTO mpesa_disburse(22, amount) ' +   //record withdraw requests
                                             "VALUES($1, $2)", [msisdn, amount],
                                             function (err, response) {
                                                 if (err) return callback(err);
