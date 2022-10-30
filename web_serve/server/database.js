@@ -752,11 +752,11 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
     
     
     exports.addIncomingSMS = function (userId, message, msisdn, callback) {
-
+        
         var sql = 'INSERT INTO incoming_sms (user_id, narrative, msisdn) values($1, $2, $3)';
-
+        
         console.log(userId, message, msisdn)
-
+        
         query(sql, [userId, message, msisdn], function (err, res) {
             if (err)
             return callback(err);
@@ -768,7 +768,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
     };
     
     function addQueueSMS (origin, destination, message, callback) {
-
+        
         var sql = 'INSERT INTO sms_queue(originator, destination, message) values($1, $2, $3)';
         query(sql, [origin, destination, message], function (err, res) {
             if (err)
@@ -784,7 +784,7 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
     
     // sms queue
     exports.addQueueSMS = function (origin, destination, message, callback) {
-
+        
         var sql = 'INSERT INTO sms_queue(originator, destination, message) values($1, $2, $3)';
         query(sql, [origin, destination, message], function (err, res) {
             if (err)
@@ -1240,76 +1240,59 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                 // assert(typeof withdrawalAddress === 'string');
                 // assert(satoshis > 200000);]
                 
-                // assert(lib.isUUIDv4(withdrawalId));
-                
-                connect(function (err, client, done) {
-                    const shouldAbort = err => {
-                        console.error('Error in transaction', err.stack)
-                        client.query('ROLLBACK', err => {
-                            if (err) {
-                                console.error('Error rolling back client', err.stack)
-                            }
-                            // release the client back to the pool
-                            callback(null)
-                        })
-                    }
-                    client.query('BEGIN', err => {
-                        if (err) return shouldAbort(err);
-                        
-                        client.query("UPDATE users SET balance_satoshis = balance_satoshis - $1,  total_withdrawal = total_withdrawal + $2 WHERE id = $3", // update user wallet
-                        [(amount + mpesa_charges), (amount + mpesa_charges), userId], function (err, response) {
-                            if (err) return callback(err);
-                            //
+                client.query("UPDATE users SET balance_satoshis = balance_satoshis - $1,  total_withdrawal = total_withdrawal + $2 WHERE id = $3", // update user wallet
+                [(amount + mpesa_charges), (amount + mpesa_charges), userId], function (err, response) {
+                    if (err) return callback(err);
+                    //
+                    
+                    client.query("SELECT balance_satoshis, msisdn FROM users WHERE id = $1", // update user wallet
+                    [userId], function (err, response) {
+                        if (err) return callback(err);
+                        var balance = response.rows[0].balance_satoshis
+                        client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
+                        VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+                        [userId, ``, `Withdraw`, (amount + mpesa_charges), 0, (balance + amount + mpesa_charges),
+                        balance, 0],
+                        function (err, response) {
                             
-                            client.query("SELECT balance_satoshis, msisdn FROM users WHERE id = $1", // update user wallet
-                            [userId], function (err, response) {
+                            if (err) return callback(err);
+                            
+                            client.query('INSERT INTO fundings(user_id, amount, bitcoin_withdrawal_address,  balance, description,global_withdrawal_id, status, check_process) ' +   //record withdraw requests
+                            "VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
+                            [userId, -1 * (amount + mpesa_charges), withdrawalAddress, balance, 'Withdrawal', withdrawalId, "success", 1],
+                            function (err, response) {
                                 if (err) return callback(err);
-                                var balance = response.rows[0].balance_satoshis
-                                client.query('INSERT INTO customer_trx_logs(user_id, trx_id, narrative, dr, cr, balance_before, balance_after, bonus) \
-                                VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
-                                [userId, ``, `Withdraw`, (amount + mpesa_charges), 0, (balance + amount + mpesa_charges),
-                                balance, 0],
-                                function (err, response) {
-                                    
+                                
+                                
+                                client.query("SELECT balance_satoshis,referred_income,bonus FROM users WHERE id = $1", // update user wallet
+                                [userId], function (err, response) {
                                     if (err) return callback(err);
+                                    var balance = response.rows[0].balance_satoshis
+                                    var mbalance = response.rows[0].balance_satoshis
+                                    var referral = response.rows[0].referred_income
+                                    var msisdn = response.rows[0].msisdn
+                                    var bonus = response.rows[0].bonus
                                     
-                                    client.query('INSERT INTO fundings(user_id, amount, bitcoin_withdrawal_address,  balance, description,global_withdrawal_id, status, check_process) ' +   //record withdraw requests
-                                    "VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-                                    [userId, -1 * (amount + mpesa_charges), withdrawalAddress, balance, 'Withdrawal', withdrawalId, "success", 1],
+                                    client.query('INSERT INTO mpesa_disburse(msisdn, amount) ' +   //record withdraw requests
+                                    "VALUES($1, $2)", [msisdn, amount],
                                     function (err, response) {
                                         if (err) return callback(err);
                                         
+                                        console.log(response)
+                                        var message = util.format(config.SMS_WITHDRAW, formatDecimals(amount), formatDecimals(balance))
                                         
-                                        client.query("SELECT balance_satoshis,referred_income,bonus FROM users WHERE id = $1", // update user wallet
-                                        [userId], function (err, response) {
-                                            if (err) return callback(err);
-                                            var balance = response.rows[0].balance_satoshis
-                                            var mbalance = response.rows[0].balance_satoshis
-                                            var referral = response.rows[0].referred_income
-                                            var msisdn = response.rows[0].msisdn
-                                            var bonus = response.rows[0].bonus
-                                            
-                                            client.query('INSERT INTO mpesa_disburse(22, amount) ' +   //record withdraw requests
-                                            "VALUES($1, $2)", [msisdn, amount],
-                                            function (err, response) {
-                                                if (err) return callback(err);
-                                                
-                                                console.log(response)
-                                                var message = util.format(config.SMS_WITHDRAW, formatDecimals(amount), formatDecimals(balance))
-                                                
-                                                addQueueSMS(config.SENDER_ID, msisdn, message, function (error, response, body) {
-                                                    addOutgoingSMS(userId, message, function (err, user) {
-                                                        callback(null, "");
-                                                    })
-                                                })
+                                        addQueueSMS(config.SENDER_ID, msisdn, message, function (error, response, body) {
+                                            addOutgoingSMS(userId, message, function (err, user) {
+                                                callback(null, "");
                                             })
                                         })
-                                        
                                     })
                                 })
+                                
                             })
                         })
                     })
+                    
                 }, callback);
             };
             
