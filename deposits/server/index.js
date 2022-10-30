@@ -90,6 +90,8 @@ var twoWeeksInSeconds = 1209600;
 
 
 var task = cron.schedule('* * * * * *', () =>  {     
+    console.log("dkd")
+
     database.addDeposit(function (err, user) {
         if (err) {
             console.log(err)
