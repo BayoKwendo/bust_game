@@ -1290,11 +1290,11 @@ function createUser(username, password, msisdn, promo_code, advert_add, ipAddres
                                             var bonus = response.rows[0].bonus
                                             
                                             client.query('INSERT INTO mpesa_disburse(msisdn, amount) ' +   //record withdraw requests
-                                            "VALUES($1, $2)",
-                                            [msisdn, amount],
+                                            "VALUES($1, $2)", [msisdn, amount],
                                             function (err, response) {
                                                 if (err) return callback(err);
                                                 
+                                                console.log(response)
                                                 var message = util.format(config.SMS_WITHDRAW, formatDecimals(amount), formatDecimals(balance))
                                                 
                                                 addQueueSMS(config.SENDER_ID, msisdn, message, function (error, response, body) {
