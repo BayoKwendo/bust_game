@@ -186,7 +186,8 @@ module.exports = function (app) {
 
     app.post('/sms_play', user.smsPlay);  // sms play user
 
-
+    app.post('/check_deposit', user.checkDeposit);  // sms play user
+    
     // app.post('/deposit_reconciliation', user.confirmDepositAgent);
 
 
